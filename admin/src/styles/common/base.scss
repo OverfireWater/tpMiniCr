@@ -1,0 +1,19 @@
+.el-table__row, .vxe-body--row {
+  font-size: 12px;
+}
+
+/* table表头背景颜色*/
+.el-table-header-wrapper {
+
+}
+
+.el-table__header-wrapper, .el-table__fixed-header-wrapper, .vxe-table--header-wrapper {
+  border-radius: 5px;
+
+  th {
+    // el-表格头部颜色
+    background-color: $tableHeaderBackgroundColor!important;
+    color: black;
+    font-weight: normal;
+  }
+}
