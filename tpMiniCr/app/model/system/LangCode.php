@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace app\model\system;
 
+use think\db\Query;
 use think\Model;
 
 class LangCode extends Model
@@ -13,10 +14,10 @@ class LangCode extends Model
 
     /**
      * code搜索器
-     * @param Model $query
+     * @param Query $query
      * @param string $value
      */
-    public function searchCodeAttr(Model $query, string $value): void
+    public function searchCodeAttr(Query $query, string $value): void
     {
         if ($value) {
             $query->where('code', $value);

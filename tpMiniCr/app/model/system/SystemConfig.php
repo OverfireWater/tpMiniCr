@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace app\model\system;
 
 use think\db\Query;
@@ -25,10 +26,10 @@ class SystemConfig extends Model
 
     /**
      * 菜单名搜索器
-     * @param Model $query
+     * @param Query $query
      * @param $value
      */
-    public function searchMenuNameAttr(Model $query, $value): void
+    public function searchMenuNameAttr(Query $query, $value): void
     {
         if (is_array($value)) {
             $query->whereIn('menu_name', $value);
@@ -39,30 +40,30 @@ class SystemConfig extends Model
 
     /**
      * tab id 搜索
-     * @param Model $query
+     * @param Query $query
      * @param $value
      */
-    public function searchTabIdAttr(Model $query, $value): void
+    public function searchTabIdAttr(Query $query, $value): void
     {
         $query->where('config_tab_id', $value);
     }
 
     /**
      * 状态搜索器
-     * @param Model $query
+     * @param Query $query
      * @param $value
      */
-    public function searchStatusAttr(Model $query, $value): void
+    public function searchStatusAttr(Query $query, $value): void
     {
         $query->where('status', $value ?: 1);
     }
 
     /**
      * value搜索器
-     * @param Model $query
+     * @param Query $query
      * @param $value
      */
-    public function searchValueAttr(Model $query, $value): void
+    public function searchValueAttr(Query $query, $value): void
     {
         $query->where('value', $value);
     }

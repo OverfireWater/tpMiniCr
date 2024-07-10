@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
+
 namespace app\model\system;
 
+use think\db\Query;
 use think\Model;
 
 class SystemMenus extends Model
@@ -11,10 +13,10 @@ class SystemMenus extends Model
 
     /**
      * 菜单规格搜索
-     * @param Model $query
+     * @param Query $query
      * @param $value
      */
-    public function searchRouteAttr(Model $query, $value): void
+    public function searchRouteAttr(Query $query, $value): void
     {
         $query->where('auth_type', 1)->where('is_del', 0);
         if ($value) {
@@ -24,20 +26,20 @@ class SystemMenus extends Model
 
     /**
      * is_show_path
-     * @param Model $query
+     * @param Query $query
      * @param $value
      */
-    public function searchIsShowPathAttr(Model $query, $value): void
+    public function searchIsShowPathAttr(Query $query, $value): void
     {
         $query->where('is_show_path', $value);
     }
 
-    public function searchPidAttr(Model $query, $value): void
+    public function searchPidAttr(Query $query, $value): void
     {
         $query->where('pid', $value);
     }
 
-    public function searchUniqueAttr(Model $query, $value): void
+    public function searchUniqueAttr(Query $query, $value): void
     {
         $query->where('is_del', 0);
         if ($value) {
@@ -48,7 +50,7 @@ class SystemMenus extends Model
     /**
      * 菜单类型搜索
      */
-    public function searchAuthTypeAttr(Model $query, $value): void
+    public function searchAuthTypeAttr(Query $query, $value): void
     {
         if (!$value) return;
         if ($value === 3) {

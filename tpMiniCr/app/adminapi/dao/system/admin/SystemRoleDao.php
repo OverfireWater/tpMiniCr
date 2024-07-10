@@ -1,6 +1,6 @@
 <?php
 
-namespace app\adminapi\dao\system;
+namespace app\adminapi\dao\system\admin;
 
 use app\model\system\SystemRole;
 use base\BaseDao;

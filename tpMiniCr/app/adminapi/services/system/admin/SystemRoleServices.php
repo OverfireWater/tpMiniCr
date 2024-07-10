@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace app\adminapi\services\system\admin;
 
-use app\adminapi\dao\system\SystemRoleDao;
+use app\adminapi\dao\system\admin\SystemRoleDao;
 use app\adminapi\services\system\SystemMenusServices;
 use base\BaseServices;
 use exceptions\ApiException;

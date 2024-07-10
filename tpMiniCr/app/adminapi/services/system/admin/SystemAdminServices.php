@@ -35,7 +35,7 @@ class SystemAdminServices extends BaseServices
     public function verifyLogin(string $account, string $password): Model|bool
     {
         $adminInfo = $this->dao->accountByAdmin($account);
-        if (!$adminInfo || !password_verify($password, $adminInfo->pwd)) return false;
+        if (!password_verify($password, $adminInfo->pwd)) return false;
         if (!$adminInfo->status) {
             throw new ApiException(400595);
         }
@@ -150,5 +150,36 @@ class SystemAdminServices extends BaseServices
 
         $adminInfo->type = $type;
         return $adminInfo->hidden(['pwd', 'is_del', 'status'])->toArray();
+    }
+
+    /**
+     * @param array $where
+     * @return array
+     * @throws Throwable
+     */
+    public function getAdminList(array $where): array
+    {
+        [$page, $limit] = $this->getPageValue();
+        $list = $this->dao->getAdminList($where, $page, $limit);
+        $count = $this->dao->count($where);
+        $roleService = app()->make(SystemRoleServices::class);
+        foreach ($list as &$value) {
+            $value['roles'] = $roleService->getColumn([['id', 'in', explode(',', $value['roles'])]], 'id, role_name');
+        }
+        return compact('count', 'list');
+    }
+
+    /**
+     * 修改管理员状态
+     * @param int $id
+     * @param mixed $status
+     * @return void
+     * @throws Throwable
+     */
+    public function updateAdminStatus(int $id, mixed $status)
+    {
+        $adminInfo = $this->dao->get($id);
+        // TODO 验证权限
+        dd($adminInfo);
     }
 }

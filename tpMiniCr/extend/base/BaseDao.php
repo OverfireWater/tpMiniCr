@@ -139,7 +139,7 @@ abstract class BaseDao
      * @param $id
      * @param array|null $field
      * @param array|null $with
-     * @return array|mixed
+     * @return array|mixed|null
      * @throws Throwable
      */
     public function get($id, ?array $field = [], ?array $with = []): mixed
@@ -152,20 +152,6 @@ abstract class BaseDao
         return $this->getModel()->where($where)->when(count($with), function ($query) use ($with) {
             $query->with($with);
         })->field($field ?? ['*'])->find();
-    }
-
-    /**
-     * 查询一条数据是否存在
-     * @param $map
-     * @param string $field
-     * @return bool 是否存在
-     * @throws Throwable
-     */
-    public function be($map, string $field = ''): bool
-    {
-        if (!is_array($map) && empty($field)) $field = $this->getPk();
-        $map = !is_array($map) ? [$field => $map] : $map;
-        return 0 < $this->getModel()->where($map)->count();
     }
 
     /**
@@ -209,12 +195,12 @@ abstract class BaseDao
 
 
     /**
-     * 删除
+     * 删除(不走模型删除)
      * @param array|int|string $id
      * @param string|null $key
-     * @return bool
+     * @return int
      */
-    public function delete(array|int|string $id, ?string $key = null): bool
+    public function delete(array|int|string $id, ?string $key = null): int
     {
         if (is_array($id)) {
             $where = $id;
@@ -331,12 +317,10 @@ abstract class BaseDao
             if ($responses->hasMethod($method)) {
                 $with[] = $key;
             } else {
-                if (!in_array($key, ['timeKey', 'store_stock', 'integral_time'])) {
-                    if (!is_array($value)) {
-                        $otherWhere[] = [$key, '=', $value];
-                    } else if (count($value) === 3) {
-                        $otherWhere[] = $value;
-                    }
+                if (!is_array($value)) {
+                    $otherWhere[] = [$key, '=', $value];
+                } else if (count($value) === 3) {
+                    $otherWhere[] = $value;
                 }
             }
         }

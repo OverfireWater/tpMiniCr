@@ -20,6 +20,15 @@ export default {
         roles: ['setting-system-role']
       },
       component: () => import('@/views/setting/systemRole')
+    },
+    {
+      path: 'system_admin',
+      name: 'systemAdmin',
+      meta: {
+        title: '管理员管理',
+        roles: ['setting-system-admin-list']
+      },
+      component: () => import('@/views/setting/systemAdmin')
     }
   ]
 }

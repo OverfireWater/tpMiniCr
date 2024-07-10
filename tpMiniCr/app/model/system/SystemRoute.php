@@ -11,21 +11,21 @@ class SystemRoute extends Model
     protected $name = 'system_route';
 
     /**
-     * @param Model $query
-     * @param string $value
+     * @param Query $query
+     * @param int $value
      * @return void
      */
-    public function searchCateIdAttr(Model $query, string $value): void
+    public function searchCateIdAttr(Query $query, int $value): void
     {
         $query->where('cate_id', $value);
     }
 
     /**
-     * @param Model $query
+     * @param Query $query
      * @param string $value
      * @return void
      */
-    public function searchAppNameAttr(Model $query, string $value): void
+    public function searchAppNameAttr(Query $query, string $value): void
     {
 
         $query->where('app_name', $value);

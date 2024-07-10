@@ -10,7 +10,7 @@
         <el-table-column prop="role_name" label="角色名称" />
         <el-table-column prop="status" label="状态">
           <template v-slot="{row}">
-            <el-switch v-model="row.status" :active-value="1" />
+            <el-switch v-model="row.status" :active-value="1" @change="changeSwitch(row)" />
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="150px">
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { getRoleList, deleteRole } from '@/api/setting'
+import { getRoleList, deleteRole, updateRoleStatus } from '@/api/setting'
 import table from '@/mixin/common/table'
 import roleForm from './components/roleForm'
 
@@ -56,8 +56,8 @@ export default {
         const { data } = res
         this.tableData = data.list
         this.total__ = data.count
+        this.loading__ = false
       }).catch(() => {})
-      this.loading__ = false
     },
     // 添加角色
     add() {
@@ -81,6 +81,19 @@ export default {
         }).catch(() => {})
       }).catch(() => {})
     },
+    // 改变状态
+    changeSwitch(e) {
+      const { id, status } = e
+      const data = {
+        id,
+        status
+      }
+      updateRoleStatus(data).then(res => {
+        this.$message.success('修改成功')
+        this.initData()
+      }).catch(() => {})
+    },
+
     // 打开弹窗
     openDialog(title) {
       this.title = title

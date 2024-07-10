@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\model\system\admin;
 
@@ -10,4 +11,8 @@ class SystemAdmin extends Model
     protected $name = 'system_admin';
 
     protected array $insert = ['add_time'];
+    protected $dateFormat = 'Y-m-d H:i:s';
+    protected $type = [
+        'last_time' => 'timestamp'
+    ];
 }

@@ -52,6 +52,9 @@ class SystemRole extends AuthBaseController
             ['rules', []],
             ['status', 1]
         ], false);
+
+        if (!$data['role_name']) return app('json')->fail(100100);
+
         $data['rules'] = implode(',', $data['rules']);
         $data['level'] = 1;
         $this->services->save($data);
@@ -88,13 +91,26 @@ class SystemRole extends AuthBaseController
     }
 
     /**
+     * 修改角色状态
+     */
+    public function updateStatus(int $id): Response
+    {
+        $data = $this->request->getMore(['status'], false);
+        $this->services->update($id, $data);
+        CacheService::clear();
+        return app('json')->success(100000);
+    }
+
+    /**
      * @param int $id
      * @return Response
      */
     public function delete(int $id): Response
     {
-        $this->services->delete($id);
         CacheService::clear();
-        return app('json')->success(100002);
+        if ($this->services->delete($id)) {
+            return app('json')->success(100002);
+        }
+        return app('json')->fail(100008);
     }
 }

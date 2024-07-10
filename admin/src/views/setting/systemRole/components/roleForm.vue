@@ -25,6 +25,7 @@
                 :props="{ children: 'children', label: 'label'}"
                 show-checkbox
                 node-key="value"
+                :default-expanded-keys="expandedKeys"
                 @check="handleCheckChange"
               />
             </div>
@@ -39,7 +40,7 @@
 </template>
 
 <script>
-import { saveRole, getRoleCreateForm, getRoleDetail } from '@/api/setting'
+import { saveRole, getRoleCreateForm, getRoleDetail, updateRole } from '@/api/setting'
 
 export default {
   props: {
@@ -57,7 +58,8 @@ export default {
         role_name: '',
         status: 1
       },
-      checkRuleBox: []
+      checkRuleBox: [],
+      expandedKeys: [] // 默认展开的节点
     }
   },
   methods: {
@@ -68,24 +70,25 @@ export default {
     },
     // 获取详情
     getDetail(id) {
-      const that = this
       getRoleDetail(id).then(res => {
         this.formData = res.data
-        that.$nextTick((e) => {
-          console.log(e)
-          res.data.rules.forEach(item => {
-            const node = that.$refs.tree.getNode(item)
-            console.log(node)
-            that.$refs.tree.setChecked(node, true)
-          })
+        this.$nextTick((e) => {
+          setTimeout(() => {
+            res.data.rules.forEach(item => {
+              const node = this.$refs.tree.getNode(item)
+              this.$refs.tree.setChecked(node, true)
+              this.expandedKeys = res.data.rules
+            })
+          }, 300)
         })
       }).catch(() => {})
     },
     // 保存
     save() {
       if (!this.formData.role_name) return this.$message.error('请填写角色名称')
-      this.formData.rules = this.checkRuleBox
-      saveRole(this.formData).then(res => {
+      this.formData.rules = this.checkRuleBox.length ? this.checkRuleBox : this.expandedKeys
+      const method = this.formData.id ? updateRole : saveRole
+      method(this.formData).then(res => {
         this.$message.success(res.msg)
         this.handleClose()
         this.$emit('initData')

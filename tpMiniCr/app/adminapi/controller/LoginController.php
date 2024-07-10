@@ -7,16 +7,16 @@ use app\adminapi\vaildate\system\admin\SystemAdminValidate;
 use app\Request;
 use services\CacheService;
 use think\exception\ValidateException;
+use think\Response;
 use Throwable;
 
 
 class LoginController
 {
-
-
     public function __construct(
         protected SystemAdminServices $services,
-        protected Request $request)
+        protected Request $request
+    )
     {}
 
     /**
@@ -24,7 +24,7 @@ class LoginController
      * @return mixed
      * @throws Throwable
      */
-    public function login(): mixed
+    public function login(): Response
     {
         [$account, $password, $key, $captchaVerification, $captchaType] = $this->request->getMore([
             'account',
@@ -60,7 +60,7 @@ class LoginController
      * 获取后台登录页轮播图以及LOGO
      * @return mixed
      */
-    public function info(): mixed
+    public function info(): Response
     {
         return app('json')->success($this->services->getLoginInfo());
     }
@@ -69,7 +69,7 @@ class LoginController
      * 退出登陆
      * @return mixed
      */
-    public function logout(): mixed
+    public function logout(): Response
     {
         $key = $this->request->header('Authorization');
         CacheService::delete(md5($key));

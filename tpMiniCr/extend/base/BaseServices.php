@@ -5,6 +5,7 @@ namespace base;
 
 use app\api\services\LoginServices;
 use exceptions\ApiException;
+use think\db\Query;
 use think\facade\Db;
 use think\facade\Config;
 use think\facade\Route as Url;
@@ -16,12 +17,12 @@ use utils\JwtAuth;
  * @method array|Model get($id, ?array $field = []) 获取一条数据
  * @method array|Model|null getOne(array $where, ?string $field = '*') 获取一条数据（不走搜素器）
  * @method string|null batchUpdate(array $ids, array $data, ?string $key = null) 批量修改
- * @method mixed update($id, array $data, ?string $field = '') 修改数据
+ * @method Model|Query update($id, array $data, ?string $field = '') 修改数据
  * @method mixed value(array $where, string $field) 获取指定条件下的数据
  * @method int count(array $where = []) 读取数据条数
  * @method int getCount(array $where = []) 获取某些条件总数（不走搜素器）
  * @method array getColumn(array $where, string $field, string $key = '') 获取某个字段数组（不走搜素器）
- * @method bool delete($id, ?string $key = null) 删除
+ * @method int delete($id, ?string $key = null) 删除
  * @method mixed save(array $data) 保存数据
  * @method mixed saveAll(array $data) 批量保存数据
  * @method Collection selectList(array $where, string $field = '*', int $page = 0, int $limit = 0, string $order = '', array $with = [], bool $search = false) 获取列表
@@ -38,7 +39,7 @@ abstract class BaseServices
      * 获取分页配置
      * @param bool $isPage
      * @param bool $isRelieve
-     * @return int[]
+     * @return array [page, limit, defaultLimit]
      */
     public function getPageValue(bool $isPage = true, bool $isRelieve = true): array
     {

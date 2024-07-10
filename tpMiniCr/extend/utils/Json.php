@@ -12,7 +12,7 @@ class Json
 {
     private int $code = 200;
 
-    public function make(int $status, string $msg, array $data = null): Response
+    public function make(int $status, mixed $msg, array $data = null): Response
     {
         $res = compact('status', 'msg');
 
