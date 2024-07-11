@@ -9,6 +9,7 @@ use app\adminapi\services\system\SystemMenusServices;
 use base\BaseServices;
 use exceptions\ApiException;
 use services\CacheService;
+use think\db\Query;
 use think\facade\Request;
 use think\Model;
 use Throwable;
@@ -149,7 +150,7 @@ class SystemAdminServices extends BaseServices
         }
 
         $adminInfo->type = $type;
-        return $adminInfo->hidden(['pwd', 'is_del', 'status'])->toArray();
+        return $adminInfo->hidden(['pwd', 'is_del'])->toArray();
     }
 
     /**
@@ -170,16 +171,99 @@ class SystemAdminServices extends BaseServices
     }
 
     /**
+     * @return array
+     * @throws Throwable
+     */
+    public function create(): array
+    {
+        return app()->make(SystemRoleServices::class)->getRoleArray(['status' => 1], 'id, role_name');
+    }
+
+    /**
+     * @param int $id
+     * @return mixed
+     * @throws Throwable
+     */
+    public function read(int $id): array
+    {
+        $roleList = $this->dao->get($id)->hidden(['pwd']);
+        if (!$roleList->roles) return $roleList->toArray();
+
+        $roles = explode(',', $roleList->roles);
+        $roleList->roles = array_map(function ($item) {
+            return (int)$item;
+        }, $roles);
+        return $roleList->toArray();
+    }
+
+    /**
      * 修改管理员状态
      * @param int $id
      * @param mixed $status
+     * @return Query|Model
+     * @throws Throwable
+     */
+    public function updateAdminStatus(int $id, mixed $status): Model|Query
+    {
+        $this->isSuperAdmin($id);
+        return $this->dao->update($id, $status);
+    }
+
+    /**
+     * @param int $id
+     * @param array $data
+     * @return Query|Model
+     * @throws Throwable
+     */
+    public function update(int $id, array $data): Model|Query
+    {
+        $this->isSuperAdmin($id);
+        if ($data['password']) {
+            if ($data['password'] !== $data['enter_pwd']) throw new ApiException(400264);
+            $data['pwd'] = $this->passwordHash($data['password']);
+        }
+        $data['roles'] = implode(',', $data['roles']);
+        return $this->dao->update($id, $data);
+    }
+
+    /**
+     * @param int $id
+     * @return int
+     * @throws Throwable
+     */
+    public function delete(int $id): int
+    {
+        $this->isSuperAdmin($id);
+        return $this->dao->delete($id);
+    }
+
+    /**
+     * @param array $data
+     * @return Model|Query
+     * @throws Throwable
+     */
+    public function save(array $data): Model|Query
+    {
+        if ($this->dao->count(['account' => $data['account'], 'is_del' => 0])) {
+            throw new ApiException(400596);
+        }
+        $data['pwd'] = $this->passwordHash($data['password']);
+        $data['head_pic'] = 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif';
+        $data['add_time'] = time();
+        $data['roles'] = implode(',', $data['roles']);
+        return $this->dao->save($data);
+    }
+
+    /**
+     * 判断是否为超级管理员
+     * @param int $id
      * @return void
      * @throws Throwable
      */
-    public function updateAdminStatus(int $id, mixed $status)
+    public function isSuperAdmin(int $id): void
     {
-        $adminInfo = $this->dao->get($id);
-        // TODO 验证权限
-        dd($adminInfo);
+        $fields = ['id, account, level'];
+        $adminInfo = $this->dao->get($id, $fields);
+        if(!$adminInfo->level) throw new ApiException('不能修改系统管理员状态');
     }
 }

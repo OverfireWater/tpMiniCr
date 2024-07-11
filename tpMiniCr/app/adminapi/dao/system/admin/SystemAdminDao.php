@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace app\adminapi\dao\system\admin;
 
 use app\model\system\admin\SystemAdmin;

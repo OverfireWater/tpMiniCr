@@ -86,6 +86,61 @@ export function getAdminList(data) {
 }
 
 /**
+ * 保存管理
+ */
+
+export function saveAdmin(data) {
+  return request({
+    url: `${pre}/admin`,
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 修改管理
+ */
+
+export function updateAdmin(data) {
+  return request({
+    url: `${pre}/admin/${data.id}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 删除管理
+ */
+export function deleteAdmin(id) {
+  return request({
+    url: `${pre}/admin/${id}`,
+    method: 'delete'
+  })
+}
+
+/**
+ * 创建表单时的数据
+ */
+
+export function getAdminCreateForm() {
+  return request({
+    url: `${pre}/admin/create`,
+    method: 'get'
+  })
+}
+
+/**
+ * 获取详情
+ */
+export function getAdminDetailForm(id) {
+  return request({
+    url: `${pre}/admin/${id}`,
+    method: 'get'
+  })
+}
+
+/**
  * 修改状态
  */
 export function updateAdminStatus(data) {

@@ -62,3 +62,9 @@
     padding: 10px 20px !important;
   }
 }
+
+.el-tag.el-tag--info {
+  background-color: $primaryLightColor-2;
+  border-color: $primaryLightColor-1;
+  color: $primaryColor;
+}

@@ -10,7 +10,7 @@
         <el-table-column prop="account" label="账号" />
         <el-table-column prop="head_pic" label="头像">
           <template v-slot="{row}">
-            <img style="width: 40px;height: 40px;" class="d-border-radius" :src="row.head_pic" alt="row.account">
+            <img style="width: 40px;height: 40px;" class="d-border-radius" :src="row.head_pic" :alt="row.account">
           </template>
         </el-table-column>
         <el-table-column label="角色">
@@ -24,6 +24,7 @@
         <el-table-column label="状态">
           <template v-slot="{row}">
             <el-switch v-if="row.level" v-model="row.status" :active-value="1" @change="changeSwitch(row)" />
+            <div v-else>正常</div>
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="150px">
@@ -42,7 +43,7 @@
 <script>
 import table from '@/mixin/common/table'
 import adminForm from './components/adminForm'
-import { getAdminList, updateAdminStatus } from '@/api/setting'
+import { getAdminList, updateAdminStatus, deleteAdmin } from '@/api/setting'
 
 export default {
   components: { adminForm },
@@ -72,12 +73,24 @@ export default {
     },
     add() {
       this.title = '添加管理'
+      this.openDialog(false)
     },
     edit(id) {
       this.title = '编辑管理'
+      this.openDialog(true)
+      this.$refs.adminForm.getDetail(id)
     },
     del(id) {
-      this.title = '删除管理'
+      this.$confirm('此操作将永久删除该管理员, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteAdmin(id).then(res => {
+          this.$message.success(res.msg)
+          this.initData()
+        }).catch(() => {})
+      }).catch(() => {})
     },
     // 改变状态
     changeSwitch(e) {
@@ -90,6 +103,13 @@ export default {
         this.$message.success('修改成功')
         this.initData()
       }).catch(() => {})
+    },
+    // 打开弹窗
+    openDialog(isEdit = false) {
+      const adminForm = this.$refs.adminForm
+      adminForm.dialogFormVisible = true
+      adminForm.isEdit = isEdit
+      adminForm.initData()
     }
   }
 }

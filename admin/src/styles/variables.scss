@@ -14,6 +14,11 @@ $sideBarWidth: 210px;
 // table表头背景颜色
 $tableHeaderBackgroundColor: #e5eeff;
 
+// 主要颜色
+$primaryColor: #409EFF;
+$primaryLightColor-1: #99bbff;
+$primaryLightColor-2: #ccddff;
+
 // the :export directive is the magic sauce for webpack
 // https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass
 :export {
@@ -26,4 +31,8 @@ $tableHeaderBackgroundColor: #e5eeff;
   subMenuHover: $subMenuHover;
   sideBarWidth: $sideBarWidth;
   tableHeaderBackgroundColor: $tableHeaderBackgroundColor;
+
+  primaryColor: $primaryColor;
+  primaryLightColor-1: $primaryLightColor-1;
+  primaryLightColor-2: $primaryLightColor-2
 }

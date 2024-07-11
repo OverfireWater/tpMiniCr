@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace app\adminapi\vaildate\system\admin;
 
 use think\Validate;
@@ -14,10 +14,9 @@ class SystemAdminValidate extends Validate
      */
     protected $rule = [
         'account' => ['require', 'alphaDash'],
-        'conf_pwd' => 'require',
-        'password' => 'require',
+        'password' => 'require|min:6',
         'real_name' => 'require',
-        'roles' => ['require', 'array'],
+        'roles' => 'require',
     ];
 
     /**
@@ -29,11 +28,10 @@ class SystemAdminValidate extends Validate
     protected $message = [
         'account.require' => '400033',
         'account.alphaDash' => '400034',
-        'conf_pwd.require' => '400263',
         'password.require' => '400256',
+        'password.min' => '400257',
         'real_name.require' => '400035',
         'roles.require' => '400036',
-        'roles.array' => '400037',
     ];
 
     protected $scene = [

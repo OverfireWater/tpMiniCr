@@ -29,6 +29,7 @@ class AdminAuthMiddleware
         }
         $adminInfo = app()->make(SystemAdminServices::class);
         $adminInfo = $adminInfo->parseToken($token);
+        if (!$adminInfo['status']) throw new ApiException(400595);
         $request->adminInfo = $adminInfo;
         $request->adminId = $adminInfo['id'];
         $request->adminRole = $adminInfo['roles'];
