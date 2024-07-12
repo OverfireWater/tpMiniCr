@@ -198,3 +198,13 @@ export function updateRouteApi(data) {
     data
   })
 }
+
+/**
+ * 删除接口
+ */
+export function deleteRouteApi(id) {
+  return request({
+    url: `${pre}/routeApi/${id}`,
+    method: 'delete'
+  })
+}

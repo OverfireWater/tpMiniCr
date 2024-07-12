@@ -28,11 +28,12 @@
                   <el-dropdown @command="handleDropdown($event, data)">
                     <i class="el-icon-more-outline" />
                     <el-dropdown-menu>
-                      <el-dropdown-item v-if="data.pid === 0" command="0" icon="el-icon-plus">新增分类</el-dropdown-item>
+                      <el-dropdown-item v-if="data.pid === 0 && !data.method" command="0" icon="el-icon-plus">新增分类</el-dropdown-item>
                       <el-dropdown-item v-if="!data.method" command="1" icon="el-icon-circle-plus">新增API接口</el-dropdown-item>
                       <el-dropdown-item v-if="!data.method" command="2" icon="el-icon-edit">修改分类名称</el-dropdown-item>
-                      <el-dropdown-item icon="el-icon-delete" command="3">删除</el-dropdown-item>
-                      <el-dropdown-item v-if="!data.method && data.children.length && data.children[0].cate_id" style="color: red" icon="el-icon-delete" command="4">删除全部接口</el-dropdown-item>
+                      <el-dropdown-item v-if="!data.method" command="3" icon="el-icon-delete">删除分类</el-dropdown-item>
+                      <el-dropdown-item v-if="data.method" command="4" icon="el-icon-delete">删除接口</el-dropdown-item>
+                      <el-dropdown-item v-if="!data.method && data.children.length && data.children[0].cate_id" style="color: red" icon="el-icon-delete" command="5">删除全部接口</el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </div>
@@ -68,7 +69,8 @@ import {
   getRouterTree,
   deleteRouteCategoryAllApi,
   saveRouteCategory,
-  updateRouteCategory
+  updateRouteCategory,
+  deleteRouteApi
 } from '@/api/system'
 import routeForm from './components/routeForm'
 
@@ -116,7 +118,7 @@ export default {
     },
     // 获取数据
     getData(apiType) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         getRouterTree(apiType).then(res => {
           this.treeData = res.data
           resolve()
@@ -187,8 +189,15 @@ export default {
           }).catch(() => {
           })
           break
-        // 删除全部接口
         case '4':
+          this.$confirm('确定要删除此接口吗？', '提示', {
+            type: 'warning'
+          }).then(() => {
+            this.deleteApi(data)
+          }).catch(() => {})
+          break
+        // 删除全部接口
+        case '5':
           this.$confirm('确定要删除此分类下的所有接口吗？<br/><span style="color: red;font-size: 12px">注：会删除此分类下的所有接口，请谨慎操作!</span>', '提示', {
             type: 'warning',
             dangerouslyUseHTMLString: true
@@ -221,6 +230,14 @@ export default {
       deleteRouteCategory(data.id, this.apiType).then(res => {
         this.$message.success(res.msg)
         this.getData(this.apiType)
+      }).catch(() => {
+      })
+    },
+    // 删除接口
+    deleteApi(data) {
+      deleteRouteApi(data.id).then(res => {
+        this.$message.success(res.msg)
+        this.initData()
       }).catch(() => {
       })
     },
