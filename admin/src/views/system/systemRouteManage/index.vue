@@ -130,9 +130,9 @@ export default {
     handleNodeClick(data) {
       if (data.cate_id) {
         this.$refs.routeForm.getRouteDetail(data.id)
-        if (this.$refs.routeForm.isEdit) this.$refs.routeForm.isEdit = false
-        if (this.$refs.routeForm.isCreate) this.$refs.routeForm.isCreate = false
-        if (this.$refs.routeForm.is_resource) this.$refs.routeForm.is_resource = false
+        this.$refs.routeForm.isEdit = false
+        this.$refs.routeForm.isCreate = false
+        this.$refs.routeForm.is_resource = false
       }
     },
     getFirstCateId(data) {

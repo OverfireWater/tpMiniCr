@@ -30,6 +30,16 @@ export default {
         title: '接口管理'
       },
       component: () => import('@/views/system/systemRouteManage/index')
+    },
+    // 代码生成
+    {
+      path: 'code_generation_list',
+      name: 'codeGenerationList',
+      meta: {
+        roles: ['system-code-generation-list'],
+        title: '代码生成'
+      },
+      component: () => import('@/views/system/systemCodeGenerationList/index')
     }
   ]
 }

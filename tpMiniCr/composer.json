@@ -1,13 +1,14 @@
 {
-    "name": "topthink/think",
-    "description": "the new thinkphp framework",
+    "name": "minicr/think",
+    "description": "the new minicr thinkphp framework",
     "type": "project",
     "keywords": [
         "framework",
+        "minicr",
         "thinkphp",
         "ORM"
     ],
-    "homepage": "https://www.thinkphp.cn/",
+    "homepage": "",
     "license": "Apache-2.0",
     "authors": [
         {
@@ -17,6 +18,10 @@
         {
             "name": "yunwuxin",
             "email": "448901948@qq.com"
+        },
+        {
+            "name": "kzy",
+            "email": "2632686733@qq.com"
         }
     ],
     "require": {
