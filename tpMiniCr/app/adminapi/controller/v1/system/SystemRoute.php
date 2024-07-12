@@ -8,6 +8,7 @@ use app\adminapi\services\system\SystemMenusServices;
 use app\adminapi\services\system\SystemRouteCateServices;
 use app\adminapi\services\system\SystemRouteServices;
 use app\Request;
+use services\CacheService;
 use think\Response;
 use Throwable;
 
@@ -45,6 +46,7 @@ class SystemRoute extends AuthBaseController
      */
     public function delete(int $id): Response
     {
+        CacheService::clear();
         if ($this->services->delete($id)) {
             return app('json')->success(100002);
         }

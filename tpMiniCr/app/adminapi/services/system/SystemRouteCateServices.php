@@ -6,6 +6,7 @@ use app\adminapi\dao\system\SystemRouteCateDao;
 use base\BaseServices;
 use exceptions\ApiException;
 use services\CacheService;
+use think\facade\Db;
 
 class SystemRouteCateServices extends BaseServices
 {

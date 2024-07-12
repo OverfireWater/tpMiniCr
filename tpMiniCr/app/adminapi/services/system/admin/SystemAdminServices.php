@@ -79,7 +79,6 @@ class SystemAdminServices extends BaseServices
             'logo_square' => sys_config('site_logo_square'),
             'newOrderAudioLink' => get_file_link(sys_config('new_order_audio_link', '')),
             'site_name' => sys_config('site_name'),
-            'site_func' => sys_config('model_checkbox', ['seckill', 'bargain', 'combination']),
             'menus' => $menus,
             'unique_auth' => $uniqueAuth
         ];
@@ -221,9 +220,13 @@ class SystemAdminServices extends BaseServices
         if ($data['password']) {
             if ($data['password'] !== $data['enter_pwd']) throw new ApiException(400264);
             $data['pwd'] = $this->passwordHash($data['password']);
+            CacheService::clear();
         }
         $data['roles'] = implode(',', $data['roles']);
-        // TODO: 修改还没做完
+        // 判断账号是否存在
+        if ($this->dao->count(['account' => $data['account'], 'is_del' => 0, 'id' => ['id', '<>', $id]])) {
+            throw new ApiException(400596);
+        }
         return $this->dao->update($id, $data);
     }
 

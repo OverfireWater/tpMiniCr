@@ -92,11 +92,10 @@ class SystemAdmin extends AuthBaseController
             ['status', 1]
         ], false);
         try {
-            validate(SystemAdminValidate::class)->check($data);
+            validate(SystemAdminValidate::class)->scene('update')->check($data);
         }catch (ValidateException $e) {
             return app('json')->fail($e->getError());
         }
-        if (!$data['enter_pwd']) return app('json')->fail(400263);
         if ($this->services->update($id, $data)) {
             return app('json')->success(100000);
         }

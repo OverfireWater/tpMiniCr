@@ -38,7 +38,6 @@ class SystemMenusDao extends BaseDao
      */
     public function getMenusUnique(array $where): array
     {
-        $where['no_model'] = sys_config('model_checkbox', ['seckill', 'bargain', 'combination']);
         return $this->search($where)->where('unique_auth', '<>', '')->column('unique_auth', '');
     }
 
