@@ -5,6 +5,7 @@ composer.lock
 .DS_Store
 Thumbs.db
 /.idea
+/vendor
 /.vscode
 /.settings
 /.buildpath
