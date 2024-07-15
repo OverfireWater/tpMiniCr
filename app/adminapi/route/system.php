@@ -42,6 +42,11 @@ Route::group('system', function () {
         Route::resource('routeCate', "$systemPre.SystemRouteCate");
         Route::delete('routeCate/delete/:id/:app_name', "$systemPre.SystemRouteCate/deleteCate")->option(['real_name' => '删除后台接口分类']);
     })->option(['real_name' => '后台接口分类管理']);
+
+    // 代码生成crud
+    Route::group(function () use ($systemPre) {
+        Route::resource('codeGeneration', "$systemPre.SystemCodeGeneration");
+    })->option(['real_name' => '代码生成']);
 })->middleware([
     \app\adminapi\middleware\AdminAuthMiddleware::class,
     \app\adminapi\middleware\AdminAuthCheckMiddleware::class

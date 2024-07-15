@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace app\services\system;
 
 use app\dao\system\SystemConfigDao;
