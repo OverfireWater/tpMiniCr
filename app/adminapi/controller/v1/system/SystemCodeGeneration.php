@@ -36,7 +36,9 @@ class SystemCodeGeneration extends AuthBaseController
      */
     public function create(SystemMenusServices $systemMenusServices): Response
     {
-        return app('json')->success($systemMenusServices->getFormCascaderMenus(1));
+        $data['menuList'] = $systemMenusServices->getFormCascaderMenus(1);
+        $data['formRule'] = $this->services->tableRules();
+        return app('json')->success($data);
     }
 
     public function delete(int $id): Response

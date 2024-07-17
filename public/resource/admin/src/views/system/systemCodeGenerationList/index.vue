@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card v-show="!isShowForm">
+    <el-card v-if="!isShowForm">
       <el-button class="d-mb-10" type="primary" size="mini" @click="add">添加功能</el-button>
       <el-table v-loading="loading__" :data="tableData">
         <el-table-column prop="id" label="id" />
@@ -18,7 +18,7 @@
         </el-table-column>
       </el-table>
     </el-card>
-    <code-generation-form v-show="isShowForm" @back="back" />
+    <code-generation-form v-else @back="back" />
   </div>
 </template>
 

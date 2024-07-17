@@ -49,9 +49,7 @@
         <!--生成文件路径-->
       </el-form>
       <el-form v-show="active === 1" ref="field" size="mini" :model="form" label-width="80px">
-        <el-form-item label="活动名称">
-          <el-input v-model="form.name" />
-        </el-form-item>
+        <code-generation-table :crud-form-rule="crudFormRule" />
       </el-form>
       <div v-show="active === 2">
         <div class="i-success">
@@ -70,11 +68,17 @@
 <script>
 import { createCrudForm } from '@/api/systemCodeGeneration'
 import { toCamelCase } from '@/utils'
+import codeGenerationTable from './codeGenerationTable'
 export default {
+  components: {
+    codeGenerationTable
+  },
   data() {
     return {
       // 菜单列表
       menuList: [],
+      // 创建crud表单时的规则
+      crudFormRule: {},
       form: {
         menu: [], // 菜单
         table_name: '', // 表名
@@ -115,7 +119,9 @@ export default {
   methods: {
     initData() {
       createCrudForm().then(res => {
-        this.menuList = res.data
+        const { data: { menuList, formRule }} = res
+        this.menuList = menuList
+        this.crudFormRule = formRule
       }).catch(() => {})
     },
     // 表名失去焦点
