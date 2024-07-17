@@ -35,43 +35,43 @@
 }
 
 .d-mt-10 {
-  margin-top: 10px;
+  margin-top: 10px!important;
 }
 
 .d-mt-20 {
-  margin-top: 20px;
+  margin-top: 20px!important;
 }
 
 .d-mt-30 {
-  margin-top: 30px;
+  margin-top: 30px!important;
 }
 
 .d-mt-40 {
-  margin-top: 40px;
+  margin-top: 40px!important;
 }
 
 .d-mt-50 {
-  margin-top: 50px;
+  margin-top: 50px!important;
 }
 
 .d-mb-10 {
-  margin-bottom: 10px;
+  margin-bottom: 10px!important;
 }
 
 .d-mb-20 {
-  margin-bottom: 20px;
+  margin-bottom: 20px!important;
 }
 
 .d-mb-30 {
-  margin-bottom: 30px;
+  margin-bottom: 30px!important;
 }
 
 .d-mb-40 {
-  margin-bottom: 40px;
+  margin-bottom: 40px!important;
 }
 
 .d-mb-50 {
-  margin-bottom: 50px;
+  margin-bottom: 50px!important;
 }
 
 .d-mr-10 {
@@ -444,6 +444,9 @@
 
 .d-border-radius {
   border-radius: 5px;
+}
+.d-border-radius-circle {
+  border-radius: 100%;
 }
 
 .d-font-12 {

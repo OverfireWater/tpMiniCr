@@ -157,6 +157,22 @@ export const getCurrentMenu = (menuList, newOpenMenus) => {
     }
     newOpenMenus.push(newMenu)
     item.children && getCurrentMenu(item.children, newOpenMenus)
-  });
+  })
   return newOpenMenus
-};
+}
+
+/**
+ * 将字符串转换为驼峰
+ */
+export const toCamelCase = (str) => {
+  // 使用正则表达式匹配所有下划线及其后面的字符，并使用一个回调函数来处理这些匹配
+  return str.replace(/_([a-z])/g, function(g) {
+    // 回调函数接收整个匹配项（这里是下划线及其后的字符），通过取匹配项中的第二个字符（即下划线后的字符）
+    // 并将其转换为大写来替换整个匹配项
+    return g[1].toUpperCase()
+  }).replace(/^./, function(match) {
+    // 将字符串的第一个字符也转换为大写（如果它是小写的话）
+    // 注意：这假设原始字符串以小写字母开头，且你想要它变成大写
+    return match.toUpperCase()
+  })
+}
