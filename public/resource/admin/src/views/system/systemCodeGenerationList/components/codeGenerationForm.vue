@@ -54,6 +54,7 @@
       <div v-show="active === 2">
         <div class="i-success">
           <i class="el-icon-check primary-color d-border-radius-circle d-p-20" />
+          <div>数据填写完成，点击完成生成crud</div>
         </div>
       </div>
       <div class="d-text-center d-mt-30">

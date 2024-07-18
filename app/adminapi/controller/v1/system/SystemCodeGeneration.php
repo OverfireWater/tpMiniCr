@@ -38,6 +38,7 @@ class SystemCodeGeneration extends AuthBaseController
     {
         $data['menuList'] = $systemMenusServices->getFormCascaderMenus(1);
         $data['formRule'] = $this->services->tableRules();
+        $data['tableList'] = $this->services->getAllTable();
         return app('json')->success($data);
     }
 
