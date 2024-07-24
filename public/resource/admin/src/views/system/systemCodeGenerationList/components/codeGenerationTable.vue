@@ -59,10 +59,15 @@
       </el-table-column>
       <el-table-column label="关联表" min-width="150px">
         <template v-slot="{row}">
-          <el-select v-model="row.hasOne" :disabled="row.is_primary_key" size="mini" placeholder="请选择关联表">
-            <el-option label="选项1" value="1" />
-            <el-option label="选项2" value="2" />
-          </el-select>
+          <el-cascader
+            v-model="row.hasOne"
+            :disabled="row.is_primary_key"
+            :options="tableList"
+            :props="{ checkStrictly: true, label: 'value' }"
+            size="mini"
+            placeholder="请选择关联表"
+            clearable
+          />
         </template>
       </el-table-column>
       <el-table-column label="索引" width="60px">
@@ -73,7 +78,7 @@
       <el-table-column label="操作" fixed="right">
         <template v-slot="{row, $index}">
           <el-button v-if="!row.is_primary_key" type="primary" size="mini" @click="del(row, $index)">删除</el-button>
-          <div v-else>------</div>
+          <div v-else>----</div>
         </template>
       </el-table-column>
     </el-table>
@@ -86,6 +91,10 @@ export default {
   props: {
     crudFormRule: {
       type: Object,
+      default: null
+    },
+    tableList: {
+      type: Array,
       default: null
     }
   },

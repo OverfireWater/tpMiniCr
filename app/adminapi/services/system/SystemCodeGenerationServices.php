@@ -159,9 +159,17 @@ class SystemCodeGenerationServices extends BaseServices
 
     public function getAllTable()
     {
-//        $sql = "SELECT TABLE_NAME, TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?";
-//
-//        $tableAll = Db::query($sql, [config('database.connections.mysql.database')]);
-        return range(0, 1000000);
+        $sql = "SELECT TABLE_NAME, TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?";
+
+        $tableList = Db::query($sql, [config('database.connections.mysql.database')]);
+        $data = [];
+        foreach ($tableList as $table) {
+            $table['TABLE_NAME'] = str_replace(config('database.connections.mysql.prefix'), '', $table['TABLE_NAME']);
+            $data[] = [
+                'value' => $table['TABLE_NAME'],
+                'label' => $table['TABLE_COMMENT']
+            ];
+        }
+        return $data;
     }
 }

@@ -48,9 +48,7 @@
         </el-form-item>
         <!--生成文件路径-->
       </el-form>
-      <el-form v-show="active === 1" ref="field" size="mini" :model="form" label-width="80px">
-        <code-generation-table :crud-form-rule="crudFormRule" />
-      </el-form>
+      <code-generation-table v-show="active === 1" :crud-form-rule="crudFormRule" :table-list="tableList" />
       <div v-show="active === 2">
         <div class="i-success">
           <i class="el-icon-check primary-color d-border-radius-circle d-p-20" />
@@ -80,6 +78,8 @@ export default {
       menuList: [],
       // 创建crud表单时的规则
       crudFormRule: {},
+      // 表单列表
+      tableList: [],
       form: {
         menu: [], // 菜单
         table_name: '', // 表名
@@ -120,9 +120,10 @@ export default {
   methods: {
     initData() {
       createCrudForm().then(res => {
-        const { data: { menuList, formRule }} = res
+        const { data: { menuList, formRule, tableList }} = res
         this.menuList = menuList
         this.crudFormRule = formRule
+        this.tableList = tableList
       }).catch(() => {})
     },
     // 表名失去焦点
