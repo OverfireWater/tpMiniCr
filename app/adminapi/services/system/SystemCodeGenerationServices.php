@@ -157,7 +157,10 @@ class SystemCodeGenerationServices extends BaseServices
         ];
     }
 
-    public function getAllTable()
+    /**
+     * @return array
+     */
+    public function getAllTable(): array
     {
         $sql = "SELECT TABLE_NAME, TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?";
 
@@ -171,5 +174,11 @@ class SystemCodeGenerationServices extends BaseServices
             ];
         }
         return $data;
+    }
+
+    public function getAllTableColumn(): array
+    {
+        // TODO
+        return array();
     }
 }
