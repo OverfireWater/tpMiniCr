@@ -46,6 +46,7 @@ Route::group('system', function () {
     // 代码生成crud
     Route::group(function () use ($systemPre) {
         Route::resource('codeGeneration', "$systemPre.SystemCodeGeneration");
+        Route::get('getTableName/:tableName', "$systemPre.SystemCodeGeneration/getTableName");
     })->option(['real_name' => '代码生成']);
 })->middleware([
     \app\adminapi\middleware\AdminAuthMiddleware::class,

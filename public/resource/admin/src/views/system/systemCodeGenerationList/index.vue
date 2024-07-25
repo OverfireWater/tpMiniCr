@@ -34,7 +34,7 @@ export default {
   data() {
     return {
       tableData: [],
-      isShowForm: true
+      isShowForm: false
     }
   },
   mounted() {
@@ -73,7 +73,13 @@ export default {
       }).catch(() => {})
     },
     back() {
-      this.isShowForm = false
+      this.$confirm('是否放弃编辑?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.isShowForm = false
+      }).catch(() => {})
     }
   }
 }

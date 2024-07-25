@@ -8,7 +8,7 @@
       </el-table-column>
       <el-table-column label="表单类型" min-width="150px">
         <template v-slot="{row}">
-          <el-select v-model="row.table_form_type" :disabled="row.is_primary_key" size="mini" placeholder="请选择表单类型">
+          <el-select v-model="row.table_form_type" :disabled="row.is_primary_key" clearable size="mini" placeholder="请选择表单类型">
             <el-option v-for="(item, index) in formType" :key="index" :label="item.label" :value="item.value" />
           </el-select>
         </template>
@@ -20,7 +20,7 @@
       </el-table-column>
       <el-table-column label="查询方式" min-width="150px">
         <template v-slot="{row}">
-          <el-select v-model="row.query_type" :disabled="row.is_primary_key" size="mini" placeholder="请选择查询方式">
+          <el-select v-model="row.query_type" :disabled="row.is_primary_key" clearable size="mini" placeholder="请选择查询方式">
             <el-option v-for="(item, index) in searchType" :key="index" :label="item.label" :value="item.value" />
           </el-select>
         </template>
@@ -63,7 +63,7 @@
             v-model="row.hasOne"
             :disabled="row.is_primary_key"
             :options="tableList"
-            :props="{ checkStrictly: true, label: 'value' }"
+            :props="codeProps"
             size="mini"
             placeholder="请选择关联表"
             clearable
@@ -87,6 +87,8 @@
 </template>
 
 <script>
+import { getTableName } from '@/api/systemCodeGeneration'
+
 export default {
   props: {
     crudFormRule: {
@@ -118,7 +120,21 @@ export default {
           is_primary_key: true,
           primary_key: 1
         }
-      ]
+      ],
+      codeProps: {
+        checkStrictly: true,
+        label: 'value',
+        lazy: true,
+        lazyLoad(node, resolve) {
+          const { label } = node
+          if (label) {
+            getTableName(label).then(res => {
+              const { data } = res
+              resolve(data)
+            }).catch(() => {})
+          }
+        }
+      }
     }
   },
   computed: {
@@ -140,6 +156,7 @@ export default {
     },
     // 添加一行
     addRow() {
+      if (!this.validateCodeForm()) return false
       const data = {
         table_column_name: '',
         table_form_type: '',
@@ -165,6 +182,33 @@ export default {
       }).then(() => {
         this.tableData.splice(index, 1)
       }).catch(() => {})
+    },
+    validateCodeForm() {
+      const tableData = this.tableData[this.tableData.length - 1]
+      if (!tableData.table_column_name) {
+        this.$message.error('请填写表单字段')
+        return false
+      }
+      if (!tableData.field) {
+        this.$message.error('请填写字段名')
+        return false
+      }
+      if (!tableData.field_type) {
+        this.$message.error('请填写字段类型')
+        return false
+      }
+      if (!tableData.length) {
+        this.$message.error('请填写字段长度')
+        return false
+      }
+      const isSome = this.tableData.some(item => {
+        return item === tableData.field
+      })
+      if (isSome) {
+        this.$message.error('字段名重复')
+        return false
+      }
+      return true
     }
   }
 }

@@ -158,6 +158,7 @@ class SystemCodeGenerationServices extends BaseServices
     }
 
     /**
+     * 获取所有表
      * @return array
      */
     public function getAllTable(): array
@@ -176,9 +177,29 @@ class SystemCodeGenerationServices extends BaseServices
         return $data;
     }
 
-    public function getAllTableColumn(): array
+    /**
+     * 获取表所有字段
+     * @param string $tableName
+     * @return array
+     */
+    public function getAllTableColumnName(string $tableName): array
     {
-        // TODO
-        return array();
+        $sql = 'SELECT * FROM `information_schema`.`columns` WHERE TABLE_SCHEMA = ? AND table_name = ? ORDER BY ORDINAL_POSITION';
+        $tableName = config('database.connections.mysql.prefix') . $tableName;
+        $tableNameList = Db::query($sql, [config('database.connections.mysql.database'), $tableName]);
+        $data = [];
+        foreach ($tableNameList as  $item) {
+            $data[] = [
+                'value' => $item['COLUMN_NAME'],
+                'label' => $item['COLUMN_COMMENT'],
+                'leaf' => true
+            ];
+        }
+        return $data;
+    }
+
+    public function saveCodeGeneration(array $data): void
+    {
+
     }
 }

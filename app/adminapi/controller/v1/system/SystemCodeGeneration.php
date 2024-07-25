@@ -42,6 +42,26 @@ class SystemCodeGeneration extends AuthBaseController
         return app('json')->success($data);
     }
 
+    public function getTableName(string $tableName): Response
+    {
+        $tableNameList = $this->services->getAllTableColumnName($tableName);
+        return app('json')->success($tableNameList);
+    }
+
+    public function save(): Response
+    {
+        $data = $this->request->getMore([
+            'make_path',
+            'menu',
+            'model_name', // 模块名
+            'name', // 菜单名
+            'table_name',
+            'tableData'
+        ], false);
+        $data['menu'] = implode(',', $data['menu']);
+        return app('json')->success($this->services->saveCodeGeneration($data));
+    }
+
     public function delete(int $id): Response
     {
         if ($this->services->delete($id)) {

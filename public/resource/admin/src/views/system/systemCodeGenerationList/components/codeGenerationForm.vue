@@ -48,11 +48,11 @@
         </el-form-item>
         <!--生成文件路径-->
       </el-form>
-      <code-generation-table v-show="active === 1" :crud-form-rule="crudFormRule" :table-list="tableList" />
+      <code-generation-table v-show="active === 1" ref="codeTable" :crud-form-rule="crudFormRule" :table-list="tableList" />
       <div v-show="active === 2">
         <div class="i-success">
           <i class="el-icon-check primary-color d-border-radius-circle d-p-20" />
-          <div>数据填写完成，点击完成生成crud</div>
+          <div class="d-mt-20">数据填写完成，点击完成生成crud</div>
         </div>
       </div>
       <div class="d-text-center d-mt-30">
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { createCrudForm } from '@/api/systemCodeGeneration'
+import { createCrudForm, saveCrud } from '@/api/systemCodeGeneration'
 import { toCamelCase } from '@/utils'
 import codeGenerationTable from './codeGenerationTable'
 export default {
@@ -111,7 +111,7 @@ export default {
         'make_path.api': [{ required: true, message: '请填写前端api', trigger: 'blur' }],
         'make_path.view': [{ required: true, message: '请填写前端页面', trigger: 'blur' }]
       },
-      active: 1 // 步骤
+      active: 0 // 步骤
     }
   },
   mounted() {
@@ -150,13 +150,22 @@ export default {
     next() {
       this.$refs.form.validate(valid => {
         if (valid) {
+          if (this.active === 1 && !this.$refs.codeTable.validateCodeForm()) return false
           if (this.active <= 1) this.active++
         }
       })
     },
     // 完成
     finish() {
-
+      const data = {
+        ...this.form,
+        tableData: this.$refs.codeTable.tableData
+      }
+      console.log(data)
+      saveCrud(data).then((res) => {
+        this.$message.success(res.msg)
+        // this.$emit('back')
+      }).catch(() => {})
     },
     back() {
       this.$emit('back')

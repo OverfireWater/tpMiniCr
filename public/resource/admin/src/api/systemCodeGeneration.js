@@ -23,6 +23,27 @@ export function createCrudForm() {
 }
 
 /**
+ * 动态获取表单字段
+ */
+export function getTableName(name) {
+  return request({
+    url: `${pre}/getTableName/${name}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 保存Crud生成
+ */
+export function saveCrud(data) {
+  return request({
+    url: `${pre}/codeGeneration`,
+    method: 'post',
+    data
+  })
+}
+
+/**
  * 删除Crud记录表
  */
 export function delCrudRecord(id) {
