@@ -9,14 +9,14 @@
         <el-step title="字段配置" />
       </el-steps>
       <el-form v-show="active === 0" ref="form" :rules="rules" size="mini" :model="form" label-width="100px">
-        <el-form-item label="父级菜单" prop="menu">
-          <el-cascader v-model="form.menu" :options="menuList" class="d-w-40" :props="{ checkStrictly: true }" clearable />
+        <el-form-item label="父级菜单" prop="menu_path">
+          <el-cascader v-model="form.menu_path" :options="menuList" class="d-w-40" :props="{ checkStrictly: true }" clearable />
         </el-form-item>
         <el-form-item label="表名" prop="table_name">
           <el-input v-model="form.table_name" class="d-w-40" placeholder="填写表名,下面表单会自动生成" @blur="table_name_blur" />
         </el-form-item>
-        <el-form-item label="菜单名" prop="name">
-          <el-input v-model="form.name" class="d-w-40" placeholder="填写菜单名" />
+        <el-form-item label="菜单名" prop="menu_name">
+          <el-input v-model="form.menu_name" class="d-w-40" placeholder="填写菜单名" />
         </el-form-item>
         <el-form-item label="模块名" prop="model_name">
           <el-input v-model="form.model_name" class="d-w-40" placeholder="填写模块名" />
@@ -83,7 +83,7 @@ export default {
       form: {
         menu: [], // 菜单
         table_name: '', // 表名
-        name: '', // 菜单名
+        menu_name: '', // 菜单名
         model_name: '', // 模块名
         make_path: {
           controller: 'app\\adminapi\\controller\\crud\\',
@@ -98,9 +98,9 @@ export default {
       },
       // 表单验证
       rules: {
-        menu: [{ required: true, message: '请选择父级菜单', trigger: 'change' }],
+        menu_path: [{ required: true, message: '请选择父级菜单', trigger: 'change' }],
         table_name: [{ required: true, message: '请填写表名', trigger: 'blur' }],
-        name: [{ required: true, message: '请填写菜单名', trigger: 'blur' }],
+        menu_name: [{ required: true, message: '请填写菜单名', trigger: 'blur' }],
         model_name: [{ required: true, message: '请填写模块名', trigger: 'blur' }],
         'make_path.controller': [{ required: true, message: '请填写控制器', trigger: 'blur' }],
         'make_path.model': [{ required: true, message: '请填写模型', trigger: 'blur' }],
@@ -130,7 +130,7 @@ export default {
     table_name_blur() {
       const table_name = this.form.table_name
       if (!table_name) return false
-      this.form.name = this.form.model_name = table_name
+      this.form.menu_name = this.form.model_name = table_name
       this.form.make_path = {
         controller: `app\\adminapi\\controller\\crud\\${toCamelCase(table_name)}.php`,
         model: `app\\model\\crud\\${toCamelCase(table_name)}.php`,

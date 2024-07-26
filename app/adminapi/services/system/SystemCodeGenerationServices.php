@@ -4,11 +4,19 @@ namespace app\adminapi\services\system;
 
 use app\adminapi\dao\system\SystemCodeGenerationDao;
 use base\BaseServices;
+use exceptions\ApiException;
 use think\facade\Db;
 use Throwable;
 
 class SystemCodeGenerationServices extends BaseServices
 {
+
+    // 不可被创建的数据表
+    protected const NO_CREAT_TABLES = [
+        'lang_code', 'system_admin', 'system_config', 'system_crud', 'system_menus', 'system_role',
+        'system_route', 'system_route_cate', 'user'
+    ];
+
     public function __construct(SystemCodeGenerationDao $dao)
     {
         $this->dao = $dao;
@@ -198,8 +206,18 @@ class SystemCodeGenerationServices extends BaseServices
         return $data;
     }
 
-    public function saveCodeGeneration(array $data): void
+    public function saveCodeGeneration(array $data): bool
     {
+        if (in_array(strtolower($data['table_name']), self::NO_CREAT_TABLES)) {
+            throw new ApiException(500041);
+        }
+        $tableName = $data['table_name'];
+        $tableComment = $data['table_name'];
+        $tableFields = $data['tableData'];
+    }
 
+    public function makeDatabase(string $tableName, string $tableComment, array $tableFields): bool
+    {
+        return true;
     }
 }

@@ -5,7 +5,9 @@ namespace app\adminapi\controller\v1\system;
 use app\adminapi\AuthBaseController;
 use app\adminapi\services\system\SystemCodeGenerationServices;
 use app\adminapi\services\system\SystemMenusServices;
+use app\adminapi\vaildate\system\SystemCodeGenerationValidate;
 use app\Request;
+use think\exception\ValidateException;
 use think\Response;
 use Throwable;
 
@@ -51,14 +53,19 @@ class SystemCodeGeneration extends AuthBaseController
     public function save(): Response
     {
         $data = $this->request->getMore([
-            'make_path',
-            'menu',
+            'make_path', // 生成路径
+            'menu_path', // 父级菜单路径
             'model_name', // 模块名
-            'name', // 菜单名
-            'table_name',
-            'tableData'
+            'menu_name', // 菜单名
+            'table_name', // 表名
+            'tableData' // 表数据
         ], false);
-        $data['menu'] = implode(',', $data['menu']);
+        try {
+            validate(SystemCodeGenerationValidate::class)->check($data);
+        }catch (ValidateException $e) {
+            return app('json')->fail($e->getMessage());
+        }
+        $data['menu_path'] = implode(',', $data['menu_path']);
         return app('json')->success($this->services->saveCodeGeneration($data));
     }
 

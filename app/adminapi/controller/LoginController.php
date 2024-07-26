@@ -28,10 +28,7 @@ class LoginController
     {
         [$account, $password, $key, $captchaVerification, $captchaType] = $this->request->getMore([
             'account',
-            'password',
-            ['key', ''],
-            ['captchaVerification', ''],
-            ['captchaType', '']
+            'password'
         ]);
 
         if (strlen(trim($password)) < 6 || strlen(trim($password)) > 32) {
