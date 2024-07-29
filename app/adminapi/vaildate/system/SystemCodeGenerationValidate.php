@@ -15,7 +15,7 @@ class SystemCodeGenerationValidate extends Validate
      */
     protected $rule = [
         'make_path' => 'require',
-        'menu' => 'require',
+        'menu_path' => 'require',
         'model_name' => 'require',
         'menu_name' => 'require',
         'table_name' => 'require',
@@ -30,7 +30,7 @@ class SystemCodeGenerationValidate extends Validate
      */
     protected $message = [
         'make_path.require' => '请填写生成路径',
-        'menu.require' => '请填写菜单',
+        'menu_path.require' => '请填写菜单',
         'model_name.require' => '请填写模型名称',
         'menu_name.require' => '请填写菜单名称',
         'table_name.require' => '请填写表名',

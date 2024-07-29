@@ -75,7 +75,7 @@ class SystemRouteServices extends BaseServices
      */
     public function save(array $data): mixed
     {
-        if ($data['is_resource']) return $this->saveResourceRoute($data);
+        if ($data['is_resource']) return $this->saveResourceRoute($data['name'], $data['path'], $data['cate_id'], $data['app_name'], $data['describe']);
         $model = parent::save($data);
         if ($model && CacheService::delete(self::ROUTE_PRE . $data['app_name'])) {
             return $model;
@@ -85,16 +85,18 @@ class SystemRouteServices extends BaseServices
 
     /**
      * 保存为资源路由
-     * @param array $data
+     * @param string $name
+     * @param string $path
+     * @param int $cate_id
+     * @param string $app_name
+     * @param string $describe
      * @return Collection
      * @throws Throwable
      */
-    public function saveResourceRoute(array $data): Collection
+    public function saveResourceRoute(string $name, string $path, int $cate_id, string $app_name = 'adminapi', string $describe = ''): Collection
     {
         $array = [];
-        $name = $data['name'];
-        $path = $data['path'];
-        $cate_id = $data['cate_id'];
+        if (!$describe) $describe = $name;
         $resource_name = [
             'index' => '获取' . $name,
             'create' => '获取' . $name . '创建表单',
@@ -127,13 +129,13 @@ class SystemRouteServices extends BaseServices
                 'name' => $v,
                 'path' => $resource_path[$k],
                 'method' => $resource_method[$k],
-                'app_name' => $data['app_name'],
-                'describe' => $data['describe'],
+                'app_name' => $app_name,
+                'describe' => $describe,
                 'cate_id' => $cate_id,
-                'add_time' => $data['add_time']
+                'add_time' => date('Y-m-d H:i:s')
             ];
         }
-        CacheService::delete(self::ROUTE_PRE . $data['app_name']);
+        CacheService::delete(self::ROUTE_PRE . $app_name);
         return $this->dao->saveAll($array);
     }
 

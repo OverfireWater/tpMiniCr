@@ -26,7 +26,7 @@ class LoginController
      */
     public function login(): Response
     {
-        [$account, $password, $key, $captchaVerification, $captchaType] = $this->request->getMore([
+        [$account, $password] = $this->request->getMore([
             'account',
             'password'
         ]);
@@ -40,7 +40,7 @@ class LoginController
         } catch (ValidateException $e) {
             return app('json')->fail($e->getError());
         }
-        $result = $this->services->login($account, $password, 'admin', $key);
+        $result = $this->services->login($account, $password, 'admin');
         if (!$result) {
             $num = CacheService::get('login_captcha', 1);
             if ($num > 1) {

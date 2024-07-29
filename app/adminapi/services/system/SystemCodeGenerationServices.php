@@ -5,7 +5,11 @@ namespace app\adminapi\services\system;
 use app\adminapi\dao\system\SystemCodeGenerationDao;
 use base\BaseServices;
 use exceptions\ApiException;
+use Phinx\Db\Adapter\AdapterFactory;
+use Phinx\Db\Adapter\AdapterInterface;
+use Phinx\Db\Adapter\AdapterWrapper;
 use think\facade\Db;
+use think\migration\db\Table;
 use Throwable;
 
 class SystemCodeGenerationServices extends BaseServices
@@ -206,6 +210,11 @@ class SystemCodeGenerationServices extends BaseServices
         return $data;
     }
 
+    /**
+     * @param array $data
+     * @return bool
+     * @throws Throwable
+     */
     public function saveCodeGeneration(array $data): bool
     {
         if (in_array(strtolower($data['table_name']), self::NO_CREAT_TABLES)) {
@@ -214,10 +223,113 @@ class SystemCodeGenerationServices extends BaseServices
         $tableName = $data['table_name'];
         $tableComment = $data['table_name'];
         $tableFields = $data['tableData'];
+        $table = $this->makeDatabase($tableName, $tableComment, $tableFields);
+
+        $menu_path = 'crud/' . $data['menu_name'];
+        $uniqueAuth = 'admin-' . $data['model_name'];
+
+        // 菜单
+        $dataMenu = [
+            'pid' => $data['pid'],
+            'menu_name' => $data['menu_name'],
+            'menu_path' => '/' . $menu_path,
+            'auth_type' => 1,
+            'is_show' => 1,
+            'is_show_path' => 1,
+            'is_del' => 0,
+            'unique_auth' => $uniqueAuth,
+            'is_header' => $data['pid'] ? 1 : 0,
+        ];
+        $systemRouteCate = app()->make(SystemRouteCateServices::class)->getCateId();
+        // 后端路由
+        $systemRoute = app()->make(SystemRouteServices::class)
+            ->saveResourceRoute($data['menu_name'], $menu_path, 1);
     }
 
-    public function makeDatabase(string $tableName, string $tableComment, array $tableFields): bool
+    public function makeDatabase(string $tableName, string $tableComment, array $tableFields): Table
     {
-        return true;
+        $table = new Table($tableName, ['comment' => $tableComment], $this->getAdapter());
+        foreach ($tableFields as $item) {
+            if ($item['is_primary_key']) {
+                continue;
+            }
+            $options = [];
+            if ($item['length']) {
+                $options['limit'] = $item['length'];
+            }
+            if ($item['default_value']) {
+                $options['default'] = $item['default_value'];
+            }
+            if ($item['comment']) {
+                $options['comment'] = $item['comment'];
+            }
+            if (in_array($item['field_type'], ['text', 'longtext', 'tinytext'])) {
+                unset($options['limit']);
+            }
+            $table->addColumn($item['field'], $item['field_type'], $options);
+            if ($item['is_index']) {
+                $table->addIndex($item['field']);
+            }
+        }
+        return $table;
+    }
+
+
+    /**
+     * 获取phinx配置
+     * @return AdapterWrapper|AdapterInterface
+     */
+    public function getAdapter(): AdapterWrapper|AdapterInterface
+    {
+        $options = $this->getDbConfig();
+
+        $adapter = AdapterFactory::instance()->getAdapter($options['adapter'], $options);
+
+        if ($adapter->hasOption('table_prefix') || $adapter->hasOption('table_suffix')) {
+            $adapter = AdapterFactory::instance()->getWrapper('prefix', $adapter);
+        }
+
+        return $adapter;
+    }
+
+    /**
+     * 获取数据库配置
+     * @return array
+     */
+    protected function getDbConfig(): array
+    {
+        $default = app()->config->get('database.default');
+
+        $config = app()->config->get("database.connections.$default");
+
+        if (0 == $config['deploy']) {
+            $dbConfig = [
+                'adapter' => $config['type'],
+                'host' => $config['hostname'],
+                'name' => $config['database'],
+                'user' => $config['username'],
+                'pass' => $config['password'],
+                'port' => $config['hostport'],
+                'charset' => $config['charset'],
+                'table_prefix' => $config['prefix'],
+            ];
+        } else {
+            $dbConfig = [
+                'adapter' => explode(',', $config['type'])[0],
+                'host' => explode(',', $config['hostname'])[0],
+                'name' => explode(',', $config['database'])[0],
+                'user' => explode(',', $config['username'])[0],
+                'pass' => explode(',', $config['password'])[0],
+                'port' => explode(',', $config['hostport'])[0],
+                'charset' => explode(',', $config['charset'])[0],
+                'table_prefix' => explode(',', $config['prefix'])[0],
+            ];
+        }
+
+        $table = app()->config->get('database.migration_table', 'migrations');
+
+        $dbConfig['default_migration_table'] = $dbConfig['table_prefix'] . $table;
+
+        return $dbConfig;
     }
 }

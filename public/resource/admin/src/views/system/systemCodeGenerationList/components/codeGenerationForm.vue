@@ -9,7 +9,7 @@
         <el-step title="字段配置" />
       </el-steps>
       <el-form v-show="active === 0" ref="form" :rules="rules" size="mini" :model="form" label-width="100px">
-        <el-form-item label="父级菜单" prop="menu_path">
+        <el-form-item label="父级菜单">
           <el-cascader v-model="form.menu_path" :options="menuList" class="d-w-40" :props="{ checkStrictly: true }" clearable />
         </el-form-item>
         <el-form-item label="表名" prop="table_name">
@@ -81,7 +81,7 @@ export default {
       // 表单列表
       tableList: [],
       form: {
-        menu: [], // 菜单
+        menu_path: [], // 菜单路径
         table_name: '', // 表名
         menu_name: '', // 菜单名
         model_name: '', // 模块名
@@ -98,7 +98,6 @@ export default {
       },
       // 表单验证
       rules: {
-        menu_path: [{ required: true, message: '请选择父级菜单', trigger: 'change' }],
         table_name: [{ required: true, message: '请填写表名', trigger: 'blur' }],
         menu_name: [{ required: true, message: '请填写菜单名', trigger: 'blur' }],
         model_name: [{ required: true, message: '请填写模块名', trigger: 'blur' }],
@@ -157,8 +156,13 @@ export default {
     },
     // 完成
     finish() {
+      let pid = 0
+      if (this.form.menu_path.length > 0) {
+        pid = this.form.menu_path[-1]
+      }
       const data = {
         ...this.form,
+        pid,
         tableData: this.$refs.codeTable.tableData
       }
       console.log(data)

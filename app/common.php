@@ -14,10 +14,10 @@ if (!function_exists('sys_config')) {
         $sysConfig = app()->make(\services\SystemConfigService::class)->get($name);
         if (is_array($sysConfig)) {
             foreach ($sysConfig as &$item) {
-                if (strpos($item, '/uploads/system/') !== false || strpos($item, '/statics/system_images/') !== false) $item = set_file_url($item);
+                if (str_contains($item, '/uploads/system/') || str_contains($item, '/statics/system_images/')) $item = set_file_url($item);
             }
         } else {
-            if (strpos($sysConfig, '/uploads/system/') !== false || strpos($sysConfig, '/statics/system_images/') !== false) $sysConfig = set_file_url($sysConfig);
+            if (str_contains($sysConfig, '/uploads/system/') || str_contains($sysConfig, '/statics/system_images/')) $sysConfig = set_file_url($sysConfig);
         }
         $config = is_array($sysConfig) ? $sysConfig : trim($sysConfig);
         if ($config === '') {
@@ -66,7 +66,7 @@ if (!function_exists('get_file_link')) {
         if (!$link) {
             return '';
         }
-        if (substr($link, 0, 4) === "http" || substr($link, 0, 2) === "//") {
+        if (str_starts_with($link, "http") || str_starts_with($link, 'https') || str_starts_with($link, "//")) {
             return $link;
         } else {
             return app()->request->domain() . $link;

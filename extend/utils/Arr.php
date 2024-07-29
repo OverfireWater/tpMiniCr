@@ -108,24 +108,6 @@ class Arr
         return $child;
     }
 
-
-    /**
-     * 获取数组中随机值
-     * @param array $data
-     * @return bool|mixed
-     */
-    public static function getArrayRandKey(array $data): mixed
-    {
-        if (!$data) {
-            return false;
-        }
-        $mun = rand(0, count($data));
-        if (!isset($data[$mun])) {
-            return self::getArrayRandKey($data);
-        }
-        return $data[$mun];
-    }
-
     /**
      * 数组转字符串去重复
      * @param array $data

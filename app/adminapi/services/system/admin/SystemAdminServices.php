@@ -54,11 +54,10 @@ class SystemAdminServices extends BaseServices
      * @param string $account
      * @param string $password
      * @param string $type
-     * @param string $key
      * @return array|bool
      * @throws Throwable
      */
-    public function login(string $account, string $password, string $type, string $key = ''): bool|array
+    public function login(string $account, string $password, string $type): bool|array
     {
         $adminInfo = $this->verifyLogin($account, $password);
         if (!$adminInfo) return false;
@@ -77,7 +76,6 @@ class SystemAdminServices extends BaseServices
             ],
             'logo' => sys_config('site_logo'),
             'logo_square' => sys_config('site_logo_square'),
-            'newOrderAudioLink' => get_file_link(sys_config('new_order_audio_link', '')),
             'site_name' => sys_config('site_name'),
             'menus' => $menus,
             'unique_auth' => $uniqueAuth
@@ -92,12 +90,12 @@ class SystemAdminServices extends BaseServices
     {
         $key = uniqid();
         $data = [
-            'slide' => '{"name":"\u5e7b\u706f\u7247","title":"slide","type":"upload","param":""}',
+            'slide' => json_decode('{"name":"\u5e7b\u706f\u7247","title":"slide","type":"upload","param":""}'),
             'logo_square' => sys_config('site_logo_square'),//透明
             'logo_rectangle' => sys_config('site_logo'),//方形
             'login_logo' => sys_config('login_logo'),//登陆
             'site_name' => sys_config('site_name'),
-            'copyright' => sys_config('nncnL_crmeb_copyright', ''),
+            'copyright' => sys_config('copyright'),
             'key' => $key,
             'login_captcha' => 0,
             'bg-big' => sys_config('login_bg_big') // 登录页大图
