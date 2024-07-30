@@ -10,6 +10,7 @@ use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Db\Adapter\AdapterWrapper;
 use think\facade\Db;
 use think\migration\db\Table;
+use think\model\Collection;
 use Throwable;
 
 class SystemCodeGenerationServices extends BaseServices
@@ -212,14 +213,15 @@ class SystemCodeGenerationServices extends BaseServices
 
     /**
      * @param array $data
-     * @return bool
+     * @return Collection
      * @throws Throwable
      */
-    public function saveCodeGeneration(array $data): bool
+    public function saveCodeGeneration(array $data): Collection
     {
         if (in_array(strtolower($data['table_name']), self::NO_CREAT_TABLES)) {
             throw new ApiException(500041);
         }
+        $cateName = $data['cate_name'];
         $tableName = $data['table_name'];
         $tableComment = $data['table_name'];
         $tableFields = $data['tableData'];
@@ -240,11 +242,11 @@ class SystemCodeGenerationServices extends BaseServices
             'unique_auth' => $uniqueAuth,
             'is_header' => $data['pid'] ? 1 : 0,
         ];
-        // TODO: 保存菜单
-        $systemRouteCate = app()->make(SystemRouteCateServices::class)->getCateId();
+        $cate_id = app()->make(SystemRouteCateServices::class)->getCateId($cateName);
         // 后端路由
         $systemRoute = app()->make(SystemRouteServices::class)
-            ->saveResourceRoute($data['menu_name'], $menu_path, 1);
+            ->saveResourceRoute($data['menu_name'], $menu_path, $cate_id);
+        return $systemRoute;
     }
 
     public function makeDatabase(string $tableName, string $tableComment, array $tableFields): Table

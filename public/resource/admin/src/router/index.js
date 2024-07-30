@@ -9,16 +9,18 @@ import system from '@/router/modules/system'
 import settings from '@/settings'
 import setting from '@/router/modules/setting'
 
+const routePre = settings.routePre
+
 // 主框架之外的路由
 export const constantRoutes = [
   {
-    path: '/login',
+    path: `${routePre}/login`,
     component: () => import('@/views/login/index'),
     hidden: true
   },
 
   {
-    path: '/404',
+    path: `${routePre}/404`,
     component: () => import('@/views/404'),
     hidden: true
   },
@@ -26,17 +28,21 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: `${routePre}/dashboard`,
     children: [{
-      path: 'dashboard',
+      path: `${routePre}/dashboard`,
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
+  },
+  {
+    path: routePre,
+    redirect: `/`
   }
 ]
 // 错误路由
-const errorRoutes = { path: '*', redirect: '/404', hidden: true }
+const errorRoutes = { path: '*', redirect: `${routePre}/404`, hidden: true }
 /**
  * 异步路由
  */

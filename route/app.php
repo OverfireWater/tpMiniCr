@@ -9,3 +9,16 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 use think\facade\Route;
+
+Route::miss(function () {
+    $appRequest = request()->url();
+    if (!$appRequest) {
+        $appName = '';
+    } else {
+        $appRequest = str_replace('//', '/', $appRequest);
+        $appName = explode('/', $appRequest)[1] ?? '';
+    }
+    if ($appName === 'admin') {
+        return view(app()->getRootPath().'/public/admin/index.html');
+    }
+});

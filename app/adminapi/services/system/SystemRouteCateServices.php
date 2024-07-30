@@ -7,6 +7,7 @@ use base\BaseServices;
 use exceptions\ApiException;
 use services\CacheService;
 use think\facade\Db;
+use Throwable;
 
 class SystemRouteCateServices extends BaseServices
 {
@@ -75,5 +76,28 @@ class SystemRouteCateServices extends BaseServices
         $flag = $this->dao->update($id, $data);
         if (!$flag['name']) throw new ApiException('修改失败');
         return CacheService::delete(self::ROUTE_PRE . $data['app_name']);
+    }
+
+    /**
+     * 创建分类，并获取id
+     * @param string $name
+     * @return int
+     * @throws Throwable
+     */
+    public function getCateId(string $name): int
+    {
+        $cate_id = $this->dao->getOne(['name' => $name, 'app_name' => 'adminapi'], 'id');
+        if ($cate_id) return $cate_id;
+        $data = [
+            'pid' => 0,
+            'app_name' => 'adminapi',
+            'name' => $name,
+            'mark' => '',
+            'add_time' => time()
+        ];
+        $cate = $this->dao->save($data);
+        if (!$cate->id) throw new ApiException('保存失败');
+        CacheService::clear();
+        return $cate->id;
     }
 }

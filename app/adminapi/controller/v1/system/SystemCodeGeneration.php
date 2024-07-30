@@ -58,7 +58,8 @@ class SystemCodeGeneration extends AuthBaseController
             'model_name', // 模块名
             'menu_name', // 菜单名
             'table_name', // 表名
-            'tableData' // 表数据
+            'tableData', // 表数据
+            ['cate_name', 'crud'] // 分类名
         ], false);
         try {
             validate(SystemCodeGenerationValidate::class)->check($data);

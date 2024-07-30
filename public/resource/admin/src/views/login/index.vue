@@ -49,7 +49,7 @@
 
 <script>
 import { getLoginInfo } from '@/api/user'
-
+import settings from '@/settings'
 export default {
   name: 'Login',
   data() {
@@ -106,7 +106,7 @@ export default {
         if (valid) {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+            this.$router.push({ path: this.redirect || `${settings.routePre}/` })
             this.loading = false
           }).catch(() => {
             this.loading = false
