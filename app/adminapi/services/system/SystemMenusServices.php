@@ -7,6 +7,7 @@ use app\adminapi\dao\system\SystemMenusDao;
 use app\adminapi\services\system\admin\SystemRoleServices;
 use base\BaseServices;
 use exceptions\ApiException;
+use think\model\Collection;
 use Throwable;
 use utils\Arr;
 
@@ -144,5 +145,65 @@ class SystemMenusServices extends BaseServices
         }
         $id_array[] = $id;
         return $this->dao->destroy($id_array);
+    }
+
+    /**
+     * @param array $menus
+     * @return Collection
+     */
+    public function saveRouteRule(array $menus): Collection
+    {
+        $data = [];
+        $uniqueAuthAll = $this->getColumn(['is_del' => 0, 'is_show' => 1], 'unique_auth');
+        $uniqueAuthAll = array_filter($uniqueAuthAll, function ($item) {
+            return !!$item;
+        });
+
+        $uniqueAuthAll = array_unique($uniqueAuthAll);
+
+        $uniqueFn = function ($path) use (&$uniqueAuthAll) {
+            $attPath = explode('/', $path);
+            $uniqueAuth = '';
+
+            if ($attPath) {
+                $pathData = [];
+                foreach ($attPath as $vv) {
+                    if (!str_contains($vv, '<')) {
+                        $pathData[] = $vv;
+                    }
+                }
+                $uniqueAuth = implode('-', $pathData);
+            }
+
+            if (in_array($uniqueAuth, $uniqueAuthAll)) {
+                $uniqueAuth .= '-' . uniqid();
+
+            }
+
+            $uniqueAuthAll[] = $uniqueAuth;
+            return $uniqueAuth;
+        };
+
+        $pid = $menus[0]['pid'];
+        $api_url = $this->getColumn(['is_del' => 0, 'is_show' => 1, 'pid' => $pid], 'api_url');
+        foreach ($menus as $menu) {
+            if (empty($menu['menu_name'])) {
+                return app('json')->fail(400198);
+            }
+            if (!in_array($menu['api_url'], $api_url)) {
+                $data[] = [
+                    'methods' => $menu['method'],
+                    'menu_name' => $menu['menu_name'],
+                    'unique_auth' => !empty($menu['unique_auth']) ? $menu['unique_auth'] : $uniqueFn($menu['api_url']),
+                    'api_url' => $menu['api_url'],
+                    'pid' => $menu['pid'],
+                    'auth_type' => 2,
+                    'path' => implode('/', $menu['path']),
+                    'is_show' => 1,
+                    'is_show_path' => 1,
+                ];
+            }
+        }
+        return $this->saveAll($data);
     }
 }

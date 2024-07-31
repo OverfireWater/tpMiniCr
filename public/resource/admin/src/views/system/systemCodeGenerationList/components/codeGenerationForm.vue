@@ -157,9 +157,8 @@ export default {
     // 完成
     finish() {
       let pid = 0
-      if (this.form.menu_path.length > 0) {
-        pid = this.form.menu_path[-1]
-      }
+      if (this.form.menu_path.length > 0) pid = this.form.menu_path[this.form.menu_path.length - 1]
+
       const data = {
         ...this.form,
         pid,

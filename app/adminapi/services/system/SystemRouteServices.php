@@ -75,7 +75,7 @@ class SystemRouteServices extends BaseServices
      */
     public function save(array $data): mixed
     {
-        if ($data['is_resource']) return $this->saveResourceRoute($data['name'], $data['path'], $data['cate_id'], $data['app_name'], $data['describe']);
+        if ($data['is_resource']) return $this->saveResourceRoute($data['name'], $data['path'], (int)$data['cate_id'], $data['app_name'], $data['describe']);
         $model = parent::save($data);
         if ($model && CacheService::delete(self::ROUTE_PRE . $data['app_name'])) {
             return $model;

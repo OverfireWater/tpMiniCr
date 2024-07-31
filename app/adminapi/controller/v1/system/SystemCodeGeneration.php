@@ -53,6 +53,7 @@ class SystemCodeGeneration extends AuthBaseController
     public function save(): Response
     {
         $data = $this->request->getMore([
+            'pid', // 父id
             'make_path', // 生成路径
             'menu_path', // 父级菜单路径
             'model_name', // 模块名
@@ -66,7 +67,6 @@ class SystemCodeGeneration extends AuthBaseController
         }catch (ValidateException $e) {
             return app('json')->fail($e->getMessage());
         }
-        $data['menu_path'] = implode(',', $data['menu_path']);
         return app('json')->success($this->services->saveCodeGeneration($data));
     }
 

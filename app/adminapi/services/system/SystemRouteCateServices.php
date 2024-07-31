@@ -87,7 +87,7 @@ class SystemRouteCateServices extends BaseServices
     public function getCateId(string $name): int
     {
         $cate_id = $this->dao->getOne(['name' => $name, 'app_name' => 'adminapi'], 'id');
-        if ($cate_id) return $cate_id;
+        if ($cate_id->id) return $cate_id->id;
         $data = [
             'pid' => 0,
             'app_name' => 'adminapi',

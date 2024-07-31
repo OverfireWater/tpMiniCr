@@ -24,7 +24,7 @@ use utils\JwtAuth;
  * @method array getColumn(array $where, string $field, string $key = '') 获取某个字段数组（不走搜素器）
  * @method int delete($id, ?string $key = null) 删除
  * @method mixed save(array $data) 保存数据
- * @method mixed saveAll(array $data) 批量保存数据
+ * @method Collection saveAll(array $data) 批量保存数据
  * @method Collection selectList(array $where, string $field = '*', int $page = 0, int $limit = 0, string $order = '', array $with = [], bool $search = false) 获取列表
  */
 abstract class BaseServices

@@ -47,6 +47,12 @@ class SystemCodeGenerationServices extends BaseServices
      */
     public function tableRules(): array
     {
+        $rule = [
+            'varchar' => 'string',
+            'int' => 'integer',
+            'biginteger' => 'bigint',
+            'tinyint' => 'boolean',
+        ];
         return [
             'types' => [
                 'varchar',
@@ -166,8 +172,23 @@ class SystemCodeGenerationServices extends BaseServices
                     'value' => 'between',
                     'label' => '用来时间区间搜索',
                 ],
-            ]
+            ],
+            'rule' => $rule
         ];
+    }
+
+    /**
+     * 改变字段类型，兼容phinx所需的字段
+     * @param string $type
+     * @return string
+     */
+    public function changeTableRules(string $type): string
+    {
+        if (!in_array($type, $this->tableRules()['types'])) {
+            throw new ApiException(500044);
+        }
+
+        return $this->tableRules()['rule'][$type] ?? $type;
     }
 
     /**
@@ -212,6 +233,7 @@ class SystemCodeGenerationServices extends BaseServices
     }
 
     /**
+     * 保存代码生成
      * @param array $data
      * @return Collection
      * @throws Throwable
@@ -234,19 +256,48 @@ class SystemCodeGenerationServices extends BaseServices
         $dataMenu = [
             'pid' => $data['pid'],
             'menu_name' => $data['menu_name'],
-            'menu_path' => '/' . $menu_path,
+            'menu_path' => '/' . $tableName,
             'auth_type' => 1,
             'is_show' => 1,
             'is_show_path' => 1,
             'is_del' => 0,
             'unique_auth' => $uniqueAuth,
-            'is_header' => $data['pid'] ? 1 : 0,
+            'path' => implode('/', $data['menu_path']),
+            'is_header' => $data['pid'] ? 0 : 1,
         ];
-        $cate_id = app()->make(SystemRouteCateServices::class)->getCateId($cateName);
-        // 后端路由
-        $systemRoute = app()->make(SystemRouteServices::class)
-            ->saveResourceRoute($data['menu_name'], $menu_path, $cate_id);
-        return $systemRoute;
+
+        // 事务
+        $res = $this->transaction(function () use ($data, $dataMenu, $cateName, $tableName, $uniqueAuth) {
+            // 创建菜单
+            $menuInfo = app()->make(SystemMenusServices::class)->save($dataMenu);
+            // 获取分类id
+            $cate_id = app()->make(SystemRouteCateServices::class)->getCateId($cateName);
+            // 后端路由创建
+            $systemRoute = app()->make(SystemRouteServices::class)->saveResourceRoute($data['menu_name'], $tableName , $cate_id);
+            //记录权限加入菜单表
+            $menuData = [];
+            $menuRoute_path = $data['menu_path'];
+            $menuRoute_path[] = $menuInfo->id;
+            foreach ($systemRoute as $item) {
+                $menuData[] = [
+                    'pid' => $menuInfo->id ?? 0,
+                    'method' => $item['method'],
+                    'api_url' => $item['path'],
+                    'unique_auth' => '',
+                    'menu_name' => $data['menu_name'],
+                    'is_del' => 0,
+                    'path' => $menuRoute_path,
+                    'auth_type' => 2,
+                ];
+            }
+            $routeRuleInfo = app()->make(SystemMenusServices::class)->saveRouteRule($menuData);
+
+            // TODO: 生成文件
+
+            return $systemRoute;
+        });
+
+        return $res;
     }
 
     public function makeDatabase(string $tableName, string $tableComment, array $tableFields): Table
@@ -269,7 +320,7 @@ class SystemCodeGenerationServices extends BaseServices
             if (in_array($item['field_type'], ['text', 'longtext', 'tinytext'])) {
                 unset($options['limit']);
             }
-            $table->addColumn($item['field'], $item['field_type'], $options);
+            $table->addColumn($item['field'], $this->changeTableRules($item['field_type']), $options);
             if ($item['is_index']) {
                 $table->addIndex($item['field']);
             }
@@ -331,7 +382,7 @@ class SystemCodeGenerationServices extends BaseServices
 
         $table = app()->config->get('database.migration_table', 'migrations');
 
-        $dbConfig['default_migration_table'] = $dbConfig['table_prefix'] . $table;
+        $dbConfig['migration_table'] = $dbConfig['table_prefix'] . $table;
 
         return $dbConfig;
     }
