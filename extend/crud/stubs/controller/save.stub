@@ -1,0 +1,16 @@
+    /**
+     * 保存
+     * @return Response
+     */
+    public function save(): Response
+    {
+        $data = $this->request->getMore([
+{%FIELD_PHP%}
+        ], false);
+
+        validate({%VALIDATE_NAME%})->check($data);
+{%OTHER_PHP%}
+        $this->service->crudSave($data);
+
+        return app('json')->success(100021);
+    }

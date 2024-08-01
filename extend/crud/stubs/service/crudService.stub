@@ -1,0 +1,19 @@
+<?php
+declare(strict_types=1);
+namespace app\adminapi\services\crud{%PATH%};
+
+use base\BaseServices;
+use think\exception\ValidateException;
+{%USE_PHP%}
+
+class {%NAME_CAMEL%}Services extends BaseServices
+{
+
+    public function __construct({%NAME_CAMEL%}Dao $dao)
+    {
+        $this->dao = $dao;
+    }
+
+{%CONTENT_PHP%}
+
+}

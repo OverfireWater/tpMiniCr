@@ -1,0 +1,23 @@
+<?php
+declare(strict_types=1);
+namespace app\adminapi\controller\crud{%PATH%};
+
+use app\adminapi\AuthBaseController;
+use app\Request;
+use think\Response;
+{%USE_PHP%}
+
+class {%NAME_CAMEL%} extends AuthController
+{
+    public function __construct(
+        {%NAME_CAMEL%}Services $service,
+        protected Request $request
+    )
+    {
+        parent::__construct();
+    }
+
+
+{%CONTENT_PHP%}
+
+}

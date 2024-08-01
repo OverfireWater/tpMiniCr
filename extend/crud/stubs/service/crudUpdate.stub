@@ -1,0 +1,10 @@
+    /**
+     * 修改
+     * @param int $id
+     * @param array $data
+     * @return Model
+     */
+    public function crudUpdate(int $id, array $data): Model
+    {
+        return $this->dao->update($id, $data);
+    }

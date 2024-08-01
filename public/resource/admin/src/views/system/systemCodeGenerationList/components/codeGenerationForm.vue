@@ -23,28 +23,28 @@
         </el-form-item>
         <!--生成文件路径-->
         <el-form-item label="控制器" prop="make_path.controller">
-          <el-input v-model="form.make_path.controller" />
+          <el-input v-model="form.make_path.controller" disabled />
         </el-form-item>
         <el-form-item label="模型" prop="make_path.model">
-          <el-input v-model="form.make_path.model" />
+          <el-input v-model="form.make_path.model" disabled />
         </el-form-item>
         <el-form-item label="dao层" prop="make_path.dao">
-          <el-input v-model="form.make_path.dao" />
+          <el-input v-model="form.make_path.dao" disabled />
         </el-form-item>
         <el-form-item label="service层" prop="make_path.service">
-          <el-input v-model="form.make_path.service" />
+          <el-input v-model="form.make_path.service" disabled />
         </el-form-item>
         <el-form-item label="路由" prop="make_path.route">
-          <el-input v-model="form.make_path.route" />
+          <el-input v-model="form.make_path.route" disabled />
         </el-form-item>
         <el-form-item label="前端路由" prop="make_path.router">
-          <el-input v-model="form.make_path.router" />
+          <el-input v-model="form.make_path.router" disabled />
         </el-form-item>
         <el-form-item label="前端api" prop="make_path.api">
-          <el-input v-model="form.make_path.api" />
+          <el-input v-model="form.make_path.api" disabled />
         </el-form-item>
         <el-form-item label="前端页面" prop="make_path.view">
-          <el-input v-model="form.make_path.view" />
+          <el-input v-model="form.make_path.view" disabled />
         </el-form-item>
         <!--生成文件路径-->
       </el-form>

@@ -1,0 +1,11 @@
+    /**
+     * 列表
+     * @return Response
+     */
+    public function index(): Response
+    {
+        $where = $this->request->getMore([
+{%FIELD_SEARCH_PHP%}
+        ], false);
+        return app('json')->success($this->service->getListIndex($where));
+    }

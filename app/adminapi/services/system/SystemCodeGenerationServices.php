@@ -37,7 +37,7 @@ class SystemCodeGenerationServices extends BaseServices
     {
         [$page, $limit] = $this->getPageValue();
         $list = $this->dao->getCodeGenerationList($where, $page, $limit);
-        $count = $this->dao->count($where);
+        $count = count($list);
         return compact('count', 'list');
     }
 
@@ -300,6 +300,13 @@ class SystemCodeGenerationServices extends BaseServices
         return $res;
     }
 
+    /**
+     * 生成数据库
+     * @param string $tableName
+     * @param string $tableComment
+     * @param array $tableFields
+     * @return Table
+     */
     public function makeDatabase(string $tableName, string $tableComment, array $tableFields): Table
     {
         $table = new Table($tableName, ['comment' => $tableComment], $this->getAdapter());
@@ -328,6 +335,14 @@ class SystemCodeGenerationServices extends BaseServices
         return $table;
     }
 
+    /**
+     * 生成文件
+     * @return void
+     */
+    public function makeFile()
+    {
+
+    }
 
     /**
      * 获取phinx配置

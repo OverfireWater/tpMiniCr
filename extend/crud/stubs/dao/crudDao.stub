@@ -1,0 +1,19 @@
+<?php
+declare(strict_types=1);
+namespace app\adminapi\dao\crud{%PATH%};
+
+
+use base\BaseDao;
+use think\Model;
+use Throwable;
+{%USE_PHP%}
+
+class {%NAME_CAMEL%}Dao extends BaseDao
+{
+
+    protected function setModel(): string
+    {
+        return {%NAME_CAMEL%}::class;
+    }
+{%CONTENT_PHP%}
+}

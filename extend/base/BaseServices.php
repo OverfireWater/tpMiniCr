@@ -22,7 +22,8 @@ use utils\JwtAuth;
  * @method int count(array $where = []) 读取数据条数
  * @method int getCount(array $where = []) 获取某些条件总数（不走搜素器）
  * @method array getColumn(array $where, string $field, string $key = '') 获取某个字段数组（不走搜素器）
- * @method int delete($id, ?string $key = null) 删除
+ * @method int delete(int $id, ?string $key = null) 删除(不走模型删除)
+ * @method bool destroy(mixed $data, bool $force = false) 删除记录
  * @method mixed save(array $data) 保存数据
  * @method Collection saveAll(array $data) 批量保存数据
  * @method Collection selectList(array $where, string $field = '*', int $page = 0, int $limit = 0, string $order = '', array $with = [], bool $search = false) 获取列表

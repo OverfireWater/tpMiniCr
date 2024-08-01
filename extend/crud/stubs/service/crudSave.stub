@@ -1,0 +1,9 @@
+    /**
+     * 新增
+     * @param array $data
+     * @return mixed
+     */
+    public function crudSave(array $data): mixed
+    {
+        return $this->dao->save($data);
+    }

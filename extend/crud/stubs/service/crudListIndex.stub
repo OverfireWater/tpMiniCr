@@ -1,0 +1,12 @@
+    /**
+     * 主页数据接口
+     * @param array $where
+     * @return array
+     */
+    public function getListIndex(array $where = []): array
+    {
+        [$page, $limit] = $this->getPageValue();
+        $model = $this->dao->searchCrudModel($where, '{%FIELD%}', '{%KEY%} desc', {%WITH%});
+        $count = count($model);
+        return compact('count', 'list');
+    }

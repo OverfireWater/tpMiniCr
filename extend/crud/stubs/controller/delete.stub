@@ -1,0 +1,13 @@
+    /**
+     * 删除
+     * @param int $id
+     * @return Response
+     */
+    public function delete(int $id): Response
+    {
+        if ($this->service->delete($id)) {
+            return app('json')->success(100002);
+        } else {
+            return app('json')->success(100008);
+        }
+    }

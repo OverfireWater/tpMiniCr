@@ -1,0 +1,9 @@
+    /**
+     * {%NAME%}获取器
+     * @param string $value
+     * @return string
+     */
+    public function get{%FIELD%}Attr(string $value): string
+    {
+{%CONTENT_PHP%}
+    }

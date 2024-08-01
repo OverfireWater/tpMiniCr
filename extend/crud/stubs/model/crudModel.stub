@@ -1,0 +1,17 @@
+<?php
+declare(strict_types=1);
+namespace app\model\crud{%PATH%};
+
+
+use think\Model;
+{%USE_PHP%}
+
+class {%NAME_CAMEL%} extends Model
+{
+{%CONTENT_PHP%}
+
+    protected $name = '{%NAME%}';
+
+    protected $pk = '{%KEY%}';
+{%ATTR_PHP%}
+}

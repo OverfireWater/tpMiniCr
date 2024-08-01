@@ -1,0 +1,13 @@
+    /**
+     * 查看
+     * @param int $id
+     * @return Response
+     */
+    public function read(int $id): Response
+    {
+        $info = $this->service->get($id, [{%FIELD%}], {%WITH%});
+        if (!$info) {
+            return app('json')->fail(100100);
+        }
+        return app('json')->success($info->toArray());
+    }

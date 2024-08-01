@@ -1,0 +1,17 @@
+﻿    /**
+     * 修改
+     * @param int $id
+     * @return Response
+     */
+    public function update(int $id): Response
+    {
+        $data = $this->request->getMore([
+{%FIELD_PHP%}
+        ], false);
+
+        validate({%VALIDATE_NAME%})->check($data);
+{%OTHER_PHP%}
+        $this->service->crudUpdate($id, $data);
+
+        return app('json')->success(100001);
+    }

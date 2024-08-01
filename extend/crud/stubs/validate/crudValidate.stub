@@ -1,0 +1,23 @@
+<?php
+declare(strict_types=1);
+namespace app\adminapi\validate\crud{%PATH%};
+
+use think\Validate;
+
+class {%NAME_CAMEL%}Validate extends Validate
+{
+
+    protected $rule = [
+{%RULE_PHP%}
+    ];
+
+
+    protected $message = [
+{%MESSAGE_PHP%}
+    ];
+
+
+    protected $scene = [
+
+    ];
+}

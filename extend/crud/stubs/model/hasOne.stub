@@ -1,0 +1,8 @@
+    /**
+     * {%NAME%}一对一关联
+     * @return HasOne
+     */
+    public function {%FIELD%}HasOne(): HasOne
+    {
+        return $this->hasOne({%CLASS%}, '{%FOREIGN_KEY%}', '{%LOCAL_KEY%}');
+    }

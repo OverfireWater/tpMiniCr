@@ -1,0 +1,9 @@
+    /**
+     * 编辑获取表单数据
+     * @param int $id
+     * @return Response
+     */
+    public function edit(int $id): Response
+    {
+        return app('json')->success($this->service->getCrudForm($id));
+    }
