@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
+
+
+use crud\enum\SearchEnum;
 
 class Dao extends Make
 {
@@ -45,10 +48,10 @@ CONTENT;
             if (isset($item['search']) && $item['search']) {
 
                 switch ($item['search']) {
-                    case SearchEnum::SEARCH_TYPE_EQ:
-                    case SearchEnum::SEARCH_TYPE_GTEQ:
-                    case SearchEnum::SEARCH_TYPE_LTEQ:
-                    case SearchEnum::SEARCH_TYPE_NEQ:
+                    case SearchEnum::SEARCH_TYPE_EQ->value:
+                    case SearchEnum::SEARCH_TYPE_GTEQ->value:
+                    case SearchEnum::SEARCH_TYPE_LTEQ->value:
+                    case SearchEnum::SEARCH_TYPE_NEQ->value:
                         $contentSearchPhp .= str_replace([
                             '{%WHERE%}',
                             '{%SEARCH%}'
@@ -57,14 +60,14 @@ CONTENT;
                             $item['search']
                         ], $contentStr);
                         break;
-                    case SearchEnum::SEARCH_TYPE_LIKE:
+                    case SearchEnum::SEARCH_TYPE_LIKE->value:
                         $contentSearchPhp .= <<<CONTENT
 ->when(!empty(\$where['$item[field]']), function(\$query) use (\$where) {
 $tab2    \$query->whereLike('$item[field]', '%'.\$where['$item[field]'].'%');
 $tab2})
 CONTENT;
                         break;
-                    case SearchEnum::SEARCH_TYPE_BETWEEN:
+                    case SearchEnum::SEARCH_TYPE_BETWEEN->value:
                         $contentSearchPhp .= <<<CONTENT
 ->when(!empty(\$where['$item[field]']), function(\$query) use (\$where) {
 $tab2    \$query->whereBetween('$item[field]', \$where['$item[field]']);

@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
 
+use crud\enum\ActionEnum;
+use think\helper\Str;
 use exceptions\ApiException;
 
 class Route extends Make
@@ -81,8 +83,8 @@ class Route extends Make
         ];
 
         $routeContent = "";
-        foreach (ActionEnum::ACTION_ALL as $item) {
-            $routeContent .= file_get_contents($this->getStub($item)) . "\r\n";
+        foreach (ActionEnum::cases() as $item) {
+            $routeContent .= file_get_contents($this->getStub($item->value)) . "\r\n";
         }
 
         $this->value['CONTENT_PHP'] = str_replace($var, $value, $routeContent);

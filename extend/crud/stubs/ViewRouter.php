@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
 
 use exceptions\ApiException;
 use think\App;

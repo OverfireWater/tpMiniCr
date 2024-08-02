@@ -189,7 +189,7 @@ class SystemMenus extends AuthBaseController
      */
     public function saveSelectRouteRule(): Response
     {
-        $menus = $this->request->getMore(['menus'], false);
+        [$menus] = $this->request->getMore(['menus']);
         if (!$menus) {
             return app('json')->fail(100026);
         }

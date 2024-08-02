@@ -24,7 +24,10 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
-
+  {
+    path: routePre,
+    redirect: `/`
+  },
   {
     path: '/',
     component: Layout,
@@ -35,10 +38,6 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
-  },
-  {
-    path: routePre,
-    redirect: `/`
   }
 ]
 // 错误路由

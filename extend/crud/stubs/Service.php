@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
+
+use crud\enum\FormTypeEnum;
+use crud\enum\ServiceActionEnum;
+use think\helper\Str;
 
 class Service extends Make
 {
@@ -8,9 +12,6 @@ class Service extends Make
 
     /**
      * @return string
-     * @author 等风来
-     * @email 136327134@qq.com
-     * @date 2023/4/4
      */
     protected function setBaseDir(): string
     {
@@ -30,7 +31,6 @@ class Service extends Make
         $hasOneFields = $options['hasOneField'] ?? [];
 
         $this->value['USE_PHP'] = $this->getDaoClassName($name, $path);
-        $this->value['MODEL_NAME'] = $options['modelName'] ?? $name;
         $this->value['NAME_CAMEL'] = Str::studly($name);
         $this->value['PATH'] = $this->getfolderPath($path);
 
@@ -68,8 +68,8 @@ class Service extends Make
     protected function getActionContent(string $name): string
     {
         $contentAction = '';
-        foreach (ServiceActionEnum::SERVICE_ACTION_ALL as $item) {
-            [, $stub] = $this->getStubContent($name, $item);
+        foreach (ServiceActionEnum::cases() as $item) {
+            [, $stub] = $this->getStubContent($name, $item->value);
             $contentAction .= $stub . "\n";
         }
 
@@ -88,11 +88,8 @@ class Service extends Make
         foreach ($columnField as $item) {
             //处理查询字段
             if (in_array($item['type'], [
-                FormTypeEnum::FRAME_IMAGES,
-                FormTypeEnum::DATE_TIME_RANGE,
-                FormTypeEnum::RADIO,
-                FormTypeEnum::SELECT,
-                FormTypeEnum::CHECKBOX
+                FormTypeEnum::FRAME_IMAGES->value,
+                FormTypeEnum::DATE_TIME_RANGE->value,
             ])) {
                 $select[] = '`' . $item['field'] . '` as ' . $item['field'] . $this->attrPrefix;
             } else {
@@ -101,7 +98,7 @@ class Service extends Make
         }
 
         if (!empty($options['key'])) {
-            array_push($select, $options['key']);
+            $select[] = $options['key'];
         }
         return implode(',', $select);
     }
@@ -119,20 +116,16 @@ class Service extends Make
         //生成form表单
         $var = [
             '{%KEY%}',
-            '{%DATE%}',
             '{%ROUTE%}',
             '{%FORM_PHP%}',
-            '{%MODEL_NAME%}',
             '{%FIELD%}',
             '{%WITH%}'
         ];
 
         $value = [
             $options['key'] ?? 'id',
-            $this->value['DATE'],
             Str::snake($options['route'] ?? $name),
             $this->getFormContent($field),
-            $options['modelName'] ?? $options['menus'] ?? $name,
             $this->getSelectFieldsContent($columnField, $options),
             $this->getWithFieldsContent($hasOneFields)
         ];
@@ -150,17 +143,12 @@ class Service extends Make
      */
     protected function getFormContent(array $field): string
     {
-        $this->value['USE_PHP'] .= "\n" . 'use crmeb\services\FormBuilder;';
+        $this->value['USE_PHP'] .= "\n" . 'use services\FormBuilder;';
 
         $from = [];
         foreach ($field as $item) {
 
-            if (in_array($item['type'], [
-                FormTypeEnum::FRAME_IMAGES,
-                FormTypeEnum::RADIO,
-                FormTypeEnum::SELECT,
-                FormTypeEnum::CHECKBOX
-            ])) {
+            if ($item['type'] === FormTypeEnum::FRAME_IMAGES->value) {
                 $fieldPre = $item['field'] . $this->attrPrefix;
             } else {
                 $fieldPre = $item['field'];
@@ -168,13 +156,13 @@ class Service extends Make
 
             //处理表单信息
             switch ($item['type']) {
-                case FormTypeEnum::FRAME_IMAGE_ONE:
+                case FormTypeEnum::FRAME_IMAGE_ONE->value:
                     $from[] = $this->tab(2) . $this->getFrameImageOnePhpContent($item['field'], $item['name']) . ';';
                     break;
-                case FormTypeEnum::FRAME_IMAGES:
+                case FormTypeEnum::FRAME_IMAGES->value:
                     $from[] = $this->tab(2) . $this->getFrameImagesPhpContent($item['field'], $item['name'], $fieldPre) . ';';
                     break;
-                case FormTypeEnum::DATE_TIME_RANGE:
+                case FormTypeEnum::DATE_TIME_RANGE->value:
                     $tab = $this->tab(2);
                     $tab3 = $this->tab(3);
                     $from[] = <<<CONTENT
@@ -186,16 +174,12 @@ class Service extends Make
 {$tab}\$statTime = \$time[0] ?? '';
 {$tab}\$endTime =  \$time[1] ?? '';
 CONTENT;
-                    $from[] = $this->tab(2) . '$rule[] = FormBuilder::' . FormTypeEnum::DATE_TIME_RANGE . '("' . $item['field'] . '", "' . $item['name'] . '", $statTime, $endTime);';
+                    $from[] = $this->tab(2) . '$rule[] = FormBuilder::' . FormTypeEnum::DATE_TIME_RANGE->value . '("' . $item['field'] . '", "' . $item['name'] . '", $statTime, $endTime);';
                     break;
                 default:
                     $valueContent = "''";
                     $input = '$info["' . $item['field'] . '"] ?? ';
-                    if (in_array($item['type'], [FormTypeEnum::CHECKBOX])) {
-                        $input = "is_string($input []) ? array_map('intval',(array)json_decode($input '', true)) : $input []";
-                    } else if (in_array($item['type'], [FormTypeEnum::RADIO, FormTypeEnum::SELECT])) {
-                        $input = 'isset($info[\'' . $item['field'] . '\']) ? (int)$info[\'' . $item['field'] . '\'] : \'\'';
-                    } else if (FormTypeEnum::SWITCH === $item['type']) {
+                    if (FormTypeEnum::SWITCH->value === $item['type']) {
                         $input = "isset(\$info['" . $item['field'] . "']) ? (string)\$info['" . $item['field'] . "'] : ''";
                     } else {
                         $input = $input . $valueContent;

@@ -1,12 +1,15 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
 
+use crud\enum\FormTypeEnum;
+use crud\enum\SearchEnum;
+use think\helper\Str;
 use think\app;
 
 class ViewPages extends Make
 {
-    protected string $name = 'pages';
+    protected string $name = 'views';
 
     protected string $fileMime = 'vue';
 
@@ -21,7 +24,7 @@ class ViewPages extends Make
      */
     protected function setBaseDir(): string
     {
-        return 'pages' . DS . 'crud';
+        return $this->name . DS . 'crud';
     }
 
     /**
@@ -67,12 +70,12 @@ class ViewPages extends Make
             $fieldValue = $item['field'];
             if (isset($item['type'])) {
 
-                if (in_array($item['type'], [FormTypeEnum::RADIO, FormTypeEnum::SELECT, FormTypeEnum::CHECKBOX, FormTypeEnum::FRAME_IMAGES])) {
+                if ($item['type'] == FormTypeEnum::FRAME_IMAGES->value) {
                     $fieldValue = $fieldValue . $this->attrPrefix;
                 }
                 //组合表单展示数据
                 switch ($item['type']) {
-                    case FormTypeEnum::FRAME_IMAGE_ONE:
+                    case FormTypeEnum::FRAME_IMAGE_ONE->value:
                         $templateContent = file_get_contents($this->getStub('image'));
                         $contentVue[] = str_replace([
                             '{%FIELD%}',
@@ -82,7 +85,7 @@ class ViewPages extends Make
                             $item['name']
                         ], $templateContent);
                         break;
-                    case FormTypeEnum::FRAME_IMAGES:
+                    case FormTypeEnum::FRAME_IMAGES->value:
                         $templateContent = file_get_contents($this->getStub('images'));
                         $contentVue[] = str_replace([
                             '{%FIELD%}',
@@ -92,7 +95,7 @@ class ViewPages extends Make
                             $item['name']
                         ], $templateContent);
                         break;
-                    case FormTypeEnum::DATE_TIME_RANGE:
+                    case FormTypeEnum::DATE_TIME_RANGE->value:
                         $tab = $this->tab(2);
                         $tab3 = $this->tab(3);
                         $tab4 = $this->tab(4);
@@ -104,7 +107,7 @@ $tab3</template>
 $tab</el-table-column>
 CONTENT;
                         break;
-                    case FormTypeEnum::SWITCH:
+                    case FormTypeEnum::SWITCH->value:
                         $tab = $this->tab(2);
                         $tab3 = $this->tab(3);
                         $tab4 = $this->tab(4);
@@ -149,14 +152,14 @@ CONTENT;
             if (isset($item['search']) && $item['search']) {
                 if (!$item['type']) {
                     switch ($item['search']) {
-                        case SearchEnum::SEARCH_TYPE_BETWEEN:
+                        case SearchEnum::SEARCH_TYPE_BETWEEN->value:
                             $item['type'] = FormTypeEnum::DATE_TIME;
                             break;
                     }
                 }
                 switch ($item['type']) {
-                    case FormTypeEnum::DATE_TIME:
-                    case FormTypeEnum::DATE_TIME_RANGE:
+                    case FormTypeEnum::DATE_TIME->value:
+                    case FormTypeEnum::DATE_TIME_RANGE->value:
                         $templateContent = file_get_contents($this->getStub('dataPicker'));
                         $contentSearchVue[] = str_replace([
                             '{%FIELD%}',
@@ -165,35 +168,6 @@ CONTENT;
                             $fieldValue,
                             $item['name']
                         ], $templateContent);
-                        break;
-                    case FormTypeEnum::CHECKBOX:
-                    case FormTypeEnum::RADIO:
-                    case FormTypeEnum::SELECT:
-                        $optionContentVue = [];
-                        if (!empty($item['options'])) {
-                            $tab = $this->tab(2);
-                            foreach ($item['options'] as $option) {
-                                $optionContentVue[] = <<<CONTENT
-$tab<el-option value="$option[value]" label="$option[label]"></el-option>
-CONTENT;
-                            }
-                        }
-                        if ($optionContentVue) {
-                            $templateContent = file_get_contents($this->getStub('select'));
-                            $contentSearchVue[] = str_replace(
-                                [
-                                    '{%FIELD%}',
-                                    '{%NAME%}',
-                                    '{%CONTENT_SELECT_OPTION_VUE%}'
-                                ],
-                                [
-                                    $fieldValue,
-                                    $item['name'],
-                                    implode("\n", $optionContentVue)
-                                ],
-                                $templateContent
-                            );
-                        }
                         break;
                     default:
                         $templateContent = file_get_contents($this->getStub('input'));
@@ -239,15 +213,15 @@ CONTENT;
             $tab = $this->tab(3);
             $fieldValue = $item['field'];
 
-            if (in_array($item['from_type'], [FormTypeEnum::RADIO, FormTypeEnum::SELECT, FormTypeEnum::CHECKBOX, FormTypeEnum::FRAME_IMAGES])) {
+            if ($item['from_type'] === FormTypeEnum::FRAME_IMAGES->value) {
                 $fieldValue = $fieldValue . $this->attrPrefix;
             }
 
-            if (FormTypeEnum::FRAME_IMAGES === $item['from_type']) {
+            if (FormTypeEnum::FRAME_IMAGES->value === $item['from_type']) {
                 $descriptionContent .= <<<CONTENT
 $tab<el-descriptions-item label="$item[comment]"><el-image v-for="item in info.$fieldValue" :src="item" :preview-src-list="info.$fieldValue"></el-descriptions-item>\n
 CONTENT;
-            } else if (FormTypeEnum::FRAME_IMAGE_ONE === $item['from_type']) {
+            } else if (FormTypeEnum::FRAME_IMAGE_ONE->value === $item['from_type']) {
                 $descriptionContent .= <<<CONTENT
 $tab<el-descriptions-item label="$item[comment]"><el-image :src="info.$fieldValue" :preview-src-list="info.$fieldValue"></el-descriptions-item>\n
 CONTENT;

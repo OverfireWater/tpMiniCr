@@ -29,6 +29,8 @@ return [
     'error_message' => '页面错误！请稍后再试～',
     // 显示错误信息
     'show_error_msg' => true,
+    // 前端admin模板路径
+    'admin_template_path' => app()->getRootPath() . '/public/resource/admin/src/',
     // admin路由前缀
     'admin_prefix' => 'admin',
     // 分页配置

@@ -138,13 +138,4 @@ class SystemRouteServices extends BaseServices
         CacheService::delete(self::ROUTE_PRE . $app_name);
         return $this->dao->saveAll($array);
     }
-
-    /**
-     * 修改api
-     */
-    public function update($id, array $data): bool
-    {
-        if (parent::update($id, $data)) return CacheService::delete(self::ROUTE_PRE . $data['app_name']);
-        return false;
-    }
 }

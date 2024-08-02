@@ -94,6 +94,7 @@ class SystemRoute extends AuthBaseController
             'cate_id'
         ], false);
         if ($this->services->update($id, $data)) {
+            CacheService::clear();
             return app('json')->success(100000);
         }
         return app('json')->fail(100006);

@@ -62,6 +62,7 @@ class SystemCodeGeneration extends AuthBaseController
             'tableData', // 表数据
             ['cate_name', 'crud'] // 分类名
         ], false);
+        return app('json')->success($data);
         try {
             validate(SystemCodeGenerationValidate::class)->check($data);
         }catch (ValidateException $e) {

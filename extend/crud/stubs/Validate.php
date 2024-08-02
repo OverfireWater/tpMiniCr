@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
 
 class Validate extends Make
 {
@@ -21,7 +21,6 @@ class Validate extends Make
      */
     public function handle(string $name, array $options = []): static
     {
-        $this->value['MODEl_NAME'] = $options['modelName'] ?? $name;
 
         $this->setRuleContent($options['field']);
 

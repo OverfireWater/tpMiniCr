@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
+
+use crud\enum\FormTypeEnum;
+use think\helper\Str;
 
 class Model extends Make
 {
@@ -27,27 +30,10 @@ class Model extends Make
         $hasOneFields = $options['hasOneField'] ?? [];
 
         $this->value['KEY'] = $options['key'] ?? 'id';
-        $this->value['MODEL_NAME'] = $options['modelName'] ?? $name;
-
-        $this->setUseDeleteContent()
-            ->setAttrFnContent($field)
+        $this->setAttrFnContent($field)
             ->setHasOneContent($hasOneFields);
 
         return parent::handle($name, $options);
-    }
-
-    /**
-     * 设置命令空间
-     * @return $this
-     */
-    protected function setUseDeleteContent(): static
-    {
-        if (isset($this->options['softDelete']) && $this->options['softDelete']) {
-            $this->value['USE_PHP'] = "use think\model\concern\SoftDelete;\n";
-            $this->value['CONTENT_PHP'] = $this->tab() . "use SoftDelete;\n";
-        }
-
-        return $this;
     }
 
     /**
@@ -59,11 +45,7 @@ class Model extends Make
     {
         $attrFnContent = [];
         foreach ($field as $item) {
-            if (in_array($item['type'], [FormTypeEnum::RADIO, FormTypeEnum::SELECT]) && !empty($item['option'])) {
-                $attrFnContent[] = $this->getAttrFnContent($item['field'], $item['name'], $item['option']);
-            } else if (FormTypeEnum::CHECKBOX == $item['type']) {
-                $attrFnContent[] = $this->getAttrFnCheckboxContent($item['field'], $item['name'], $item['option']);
-            } else if (in_array($item['type'], [FormTypeEnum::FRAME_IMAGES, FormTypeEnum::DATE_TIME_RANGE])) {
+            if (in_array($item['type'], [FormTypeEnum::FRAME_IMAGES->value, FormTypeEnum::DATE_TIME_RANGE->value])) {
                 $attrFnContent[] = $this->getAttrJoinFnContent($item['field'], $item['name']);
             }
         }
@@ -162,14 +144,12 @@ CONTENT;
 
         $var = [
             '{%FIELD%}',
-            '{%DATE%}',
             '{%NAME%}',
             '{%CONTENT_PHP%}'
         ];
 
         $value = [
             Str::studly($key . $this->attrPrefix),
-            date('Y-m-d'),
             $comment,
             $content
         ];
@@ -184,9 +164,6 @@ CONTENT;
      * @param string $comment
      * @param array $options
      * @return array|false|string|string[]
-     * @author 等风来
-     * @email 136327134@qq.com
-     * @date 2023/5/11
      */
     protected function getAttrFnContent(string $key, string $comment, array $options): array|bool|string
     {
@@ -194,14 +171,12 @@ CONTENT;
 
         $var = [
             '{%FIELD%}',
-            '{%DATE%}',
             '{%NAME%}',
             '{%CONTENT_PHP%}'
         ];
 
         $value = [
             Str::studly($key . $this->attrPrefix),
-            date('Y-m-d'),
             $comment,
             $this->getSwitchAndSelectPhpContent($options)
         ];
@@ -213,9 +188,6 @@ CONTENT;
      * 获取开关和下拉框获取器内容
      * @param array $options
      * @return string
-     * @author 等风来
-     * @email 136327134@qq.com
-     * @date 2023/5/11
      */
     protected function getSwitchAndSelectPhpContent(array $options): string
     {
@@ -245,7 +217,6 @@ CONTENT;
     protected function getHasPhpContent(array $fields): string
     {
         $hasOneStub = file_get_contents($this->getStub('hasOne'));
-        $date = date('Y/m/d');
 
         $content = '';
         foreach ($fields as $item) {
@@ -258,7 +229,6 @@ CONTENT;
                 $content .= "\n" . str_replace(
                         [
                             '{%NAME%}',
-                            '{%DATE%}',
                             '{%FIELD%}',
                             '{%CLASS%}',
                             '{%FOREIGN_KEY%}',
@@ -266,7 +236,6 @@ CONTENT;
                         ],
                         [
                             $item['name'],
-                            $date,
                             Str::camel($item['field']),
                             $modelName,
                             $foreignKey,

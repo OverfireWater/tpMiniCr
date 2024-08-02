@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
 
+use crud\enum\ActionEnum;
+use think\helper\Str;
 use exceptions\ApiException;
 use think\App;
 
@@ -52,8 +54,8 @@ class ViewApi extends Make
     {
         $contentJs = '';
 
-        foreach (ActionEnum::ACTION_ALL as $item) {
-            $contentJs .= file_get_contents($this->getStub($item)) . "\n";
+        foreach (ActionEnum::cases() as $item) {
+            $contentJs .= file_get_contents($this->getStub($item->value)) . "\n";
         }
 
         $var = [

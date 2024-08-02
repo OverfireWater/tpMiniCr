@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
+
+use crud\enum\ActionEnum;
+use crud\enum\FormTypeEnum;
 use think\helper\Str;
 
 class Controller extends Make
@@ -29,7 +32,6 @@ class Controller extends Make
         $field = $options['field'] ?? [];
         $hasOneFields = $options['hasOneField'] ?? [];
 
-        $this->value['MODEL_NAME'] = $options['modelName'] ?? $name;
         $this->value['NAME_CAMEL'] = Str::studly($name);
         $this->value['PATH'] = $this->getfolderPath($path);
 
@@ -82,7 +84,6 @@ class Controller extends Make
     protected function setControllerContent(array $field, array $searchField, string $name, array $columnField, array $hasOneFields): static
     {
         $var = [
-            "{%DATE%}",
             '{%VALIDATE_NAME%}',
             '{%FIELD_PHP%}',
             '{%FIELD%}',
@@ -93,7 +94,6 @@ class Controller extends Make
         ];
 
         $replace = [
-            $this->value['DATE'],
             $this->options['validateName'] ?? '',
             $this->getSearchFieldContent($field),
             $this->getSearchListFieldContent($columnField),
@@ -131,8 +131,8 @@ class Controller extends Make
     protected function getStubControllerContent(string $name): string
     {
         $contentPhp = '';
-        foreach (ActionEnum::ACTION_ALL as $item) {
-            [, $stub] = $this->getStubContent($name, $item);
+        foreach (ActionEnum::cases() as $item) {
+            [, $stub] = $this->getStubContent($name, $item->value);
             $contentPhp .= $stub . "\r\n";
         }
 
@@ -150,11 +150,9 @@ class Controller extends Make
         foreach ($columnField as $item) {
             //处理查询字段
             if (in_array($item['type'], [
-                FormTypeEnum::DATE_TIME_RANGE,
-                FormTypeEnum::FRAME_IMAGES,
-                FormTypeEnum::RADIO,
-                FormTypeEnum::SELECT,
-                FormTypeEnum::CHECKBOX])) {
+                FormTypeEnum::DATE_TIME_RANGE->value,
+                FormTypeEnum::FRAME_IMAGES->value
+            ])) {
                 $select[] = '`' . $item['field'] . '` as ' . $item['field'] . $this->attrPrefix;
             }
         }
@@ -195,7 +193,7 @@ class Controller extends Make
     {
         $fieldAll = [];
         foreach ($columnField as $item) {
-            if ($item['type'] == FormTypeEnum::SWITCH) {
+            if ($item['type'] == FormTypeEnum::SWITCH->value) {
                 $fieldAll[] = $item['field'];
             }
         }
@@ -213,7 +211,7 @@ class Controller extends Make
 
         foreach ($columnField as $item) {
             //处理查询字段
-            if (in_array($item['type'], [FormTypeEnum::FRAME_IMAGES, FormTypeEnum::CHECKBOX, FormTypeEnum::DATE_TIME_RANGE])) {
+            if (in_array($item['type'], [FormTypeEnum::FRAME_IMAGES->value, FormTypeEnum::DATE_TIME_RANGE->value])) {
                 if (!$otherContent) {
                     $otherContent .= "\n";
                 }

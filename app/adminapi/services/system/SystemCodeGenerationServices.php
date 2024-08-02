@@ -4,10 +4,21 @@ namespace app\adminapi\services\system;
 
 use app\adminapi\dao\system\SystemCodeGenerationDao;
 use base\BaseServices;
+use crud\stubs\Controller;
+use crud\stubs\Dao;
+use crud\stubs\Make;
+use crud\stubs\Model;
+use crud\stubs\Route;
+use crud\stubs\Service;
+use crud\stubs\Validate;
+use crud\stubs\ViewApi;
+use crud\stubs\ViewPages;
+use crud\stubs\ViewRouter;
 use exceptions\ApiException;
 use Phinx\Db\Adapter\AdapterFactory;
 use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Db\Adapter\AdapterWrapper;
+use services\FileService;
 use think\facade\Db;
 use think\migration\db\Table;
 use think\model\Collection;
@@ -111,26 +122,8 @@ class SystemCodeGenerationServices extends BaseServices
                     'limit' => 200
                 ],
                 [
-                    'value' => 'checkbox',
-                    'label' => '多选框',
-                    'field_type' => 'varchar',
-                    'limit' => 200
-                ],
-                [
-                    'value' => 'radio',
-                    'label' => '单选框',
-                    'field_type' => 'int',
-                    'limit' => 11
-                ],
-                [
                     'value' => 'switches',
                     'label' => '开关',
-                    'field_type' => 'int',
-                    'limit' => 11
-                ],
-                [
-                    'value' => 'select',
-                    'label' => '下拉框',
                     'field_type' => 'int',
                     'limit' => 11
                 ],
@@ -247,6 +240,7 @@ class SystemCodeGenerationServices extends BaseServices
         $tableName = $data['table_name'];
         $tableComment = $data['table_name'];
         $tableFields = $data['tableData'];
+        $filePath = $data['make_path'];
         $table = $this->makeDatabase($tableName, $tableComment, $tableFields);
 
         $menu_path = 'crud/' . $data['menu_name'];
@@ -265,9 +259,17 @@ class SystemCodeGenerationServices extends BaseServices
             'path' => implode('/', $data['menu_path']),
             'is_header' => $data['pid'] ? 0 : 1,
         ];
+        //增加保存的绝对路径
+        foreach ($filePath as $k => $i) {
+            if (in_array($k, ['view', 'router', 'api'])) {
+                $filePath[$k] = Make::adminTemplatePath() . $i;
+            } else {
+                $filePath[$k] = app()->getRootPath() . $i;
+            }
+        }
 
         // 事务
-        $res = $this->transaction(function () use ($data, $dataMenu, $cateName, $tableName, $uniqueAuth) {
+        $res = $this->transaction(function () use ($data, $dataMenu, $cateName, $tableName, $uniqueAuth, $filePath) {
             // 创建菜单
             $menuInfo = app()->make(SystemMenusServices::class)->save($dataMenu);
             // 获取分类id
@@ -293,6 +295,7 @@ class SystemCodeGenerationServices extends BaseServices
             $routeRuleInfo = app()->make(SystemMenusServices::class)->saveRouteRule($menuData);
 
             // TODO: 生成文件
+            $make = $this->makeFile($tableName, $tableName, true, $data, $filePath);
 
             return $systemRoute;
         });
@@ -337,13 +340,172 @@ class SystemCodeGenerationServices extends BaseServices
 
     /**
      * 生成文件
-     * @return void
      */
-    public function makeFile()
+    public function makeFile(string $tableName, string $routeName, bool $isMake = false, array $options = [], array $filePath = [], string $basePath = ''): array
     {
+        // 表单字段
+        $fromField = [];
+        // 数据库字段
+        $columnField = [];
+        // 搜索字段
+        $searchField = [];
+        // 关联字段
+        $hasOneField = [];
+        foreach ($options as $item) {
+            $fromField[] = [
+                'field' => $item['table_column_name'],
+                'type' => $item['table_form_type'],
+                'name' => $tableName,
+                'required' => $item['is_required'],
+                'option' => []
+            ];
+            if (!$item['is_primary_key']) {
+                $columnField[] = [
+                    'field' => $item['field'],
+                    'name' => $tableName,
+                    'type' => $item['field_type'],
+                ];
+            }
+            if ($item['query_type']) {
+                $searchField[] = [
+                    'field' => $item['field'],
+                    'type' => $item['table_form_type'],
+                    'name' => $tableName,
+                    'search' => $item['query_type'],
+                    'options' => []
+                ];
+            }
+            if ($item['hasOne'] && count($item['hasOne'])) {
+                $hasOneField[] = [
+                    'field' => $item['field'],
+                    'hasOne' => $item['hasOne'],
+                    'name' => $tableName,
+                ];
+            }
+            if ($item['is_primary_key']) {
+                $options['key'] = $item['field'];
+                break;
+            }
+        }
+        $options['fromField'] = $fromField;
+        $options['columnField'] = $columnField;
+        $options['searchField'] = $searchField;
+        $options['hasOneField'] = $hasOneField;
 
+        //生成模型
+        $model = app()->make(Model::class);
+        $model->setFilePathName($filePath['model'] ?? '')->setbasePath($basePath)->handle($tableName, $options);
+        //生成dao
+        $dao = app()->make(Dao::class);
+        $dao->setFilePathName($filePath['dao'] ?? '')->setbasePath($basePath)->handle($tableName, [
+            'usePath' => $model->getUsePath(),
+            'modelName' => $options['model_name'] ?? '',
+            'searchField' => $options['searchField'] ?? [],
+        ]);
+        //生成service
+        $service = app()->make(Service::class);
+        $service->setFilePathName($filePath['service'] ?? '')->setbasePath($basePath)->handle($tableName, [
+            'field' => $options['fromField'],
+            'columnField' => $options['columnField'],
+            'key' => $options['key'],
+            'usePath' => $dao->getUsePath(),
+            'modelName' => $options['model_name'] ?? '',
+            'hasOneField' => $options['hasOneField'] ?? [],
+        ]);
+        //生成验证器
+        $validate = app()->make(Validate::class);
+        $validate->setFilePathName($filePath['validate'] ?? '')->setbasePath($basePath)->handle($tableName, [
+            'field' => $options['fromField'],
+            'modelName' => $options['model_name'] ?? '',
+        ]);
+        //生成控制器
+        $controller = app()->make(Controller::class);
+        $controller->setFilePathName($filePath['controller'] ?? '')->setbasePath($basePath)->handle($tableName, [
+            'usePath' => $service->getUsePath(),
+            'modelName' => $options['model_name'] ?? '',
+            'searchField' => $options['searchField'] ?? [],
+            'columnField' => $options['columnField'] ?? [],
+            'validateName' => '\\' . str_replace('/', '\\', $validate->getUsePath()) . 'Validate::class',
+            'field' => array_column($options['fromField'], 'field'),
+        ]);
+        //生成路由
+        $route = app()->make(Route::class);
+        $route->setFilePathName($filePath['route'] ?? '')->setbasePath($basePath)->handle($tableName, [
+            'menus' => $options['model_name'] ?? $options['menu_name'],
+            'route' => $routeName
+        ]);
+        //生成前台路由
+        $viewRouter = app()->make(ViewRouter::class);
+        $viewRouter->setFilePathName($filePath['router'] ?? '')->setbasePath($basePath)->handle($tableName, [
+            'route' => $routeName,
+            'menuName' => $options['menu_name'],
+            'modelName' => $options['model_name'] ?? $options['menu_name'],
+        ]);
+        //生成前台接口
+        $viewApi = app()->make(ViewApi::class);
+        $viewApi->setFilePathName($filePath['api'] ?? '')->setbasePath($basePath)->handle($tableName, [
+            'route' => $routeName,
+        ]);
+
+        //生成前台页面
+        $viewPages = app()->make(ViewPages::class);
+        $viewPages->setFilePathName($filePath['pages'] ?? '')->setbasePath($basePath)->handle($tableName, [
+            'field' => $options['columnField'],
+            'tableFields' => $options['tableField'] ?? [],
+            'searchField' => $options['searchField'] ?? [],
+            'route' => $routeName,
+            'key' => $options['key'],
+            'pathApiJs' => '@/' . str_replace('\\', '/', str_replace([Make::adminTemplatePath(), '.js'], '', $viewApi->getPath())),
+        ]);
+
+        //创建文件
+        if ($isMake) {
+            FileService::batchMakeFiles([$model, $validate, $dao, $service, $controller, $route, $viewApi, $viewPages, $viewRouter]);
+        }
+        return [
+            'controller' => [
+                'path' => $this->replace($controller->getPath()),
+                'content' => $controller->getContent()
+            ],
+            'model' => [
+                'path' => $this->replace($model->getPath()),
+                'content' => $model->getContent()
+            ],
+            'dao' => [
+                'path' => $this->replace($dao->getPath()),
+                'content' => $dao->getContent()
+            ],
+            'route' => [
+                'path' => $this->replace($route->getPath()),
+                'content' => $route->getContent()
+            ],
+            'service' => [
+                'path' => $this->replace($service->getPath()),
+                'content' => $service->getContent()
+            ],
+            'validate' => [
+                'path' => $this->replace($validate->getPath()),
+                'content' => $validate->getContent()
+            ],
+            'router' => [
+                'path' => $this->replace($viewRouter->getPath()),
+                'content' => $viewRouter->getContent()
+            ],
+            'api' => [
+                'path' => $this->replace($viewApi->getPath()),
+                'content' => $viewApi->getContent()
+            ],
+            'pages' => [
+                'path' => $this->replace($viewPages->getPath()),
+                'content' => $viewPages->getContent()
+            ]
+        ];
     }
 
+    protected function replace(string $path): array|string
+    {
+        return str_replace([app()->getRootPath(), Make::adminTemplatePath()], '', $path);
+    }
     /**
      * 获取phinx配置
      * @return AdapterWrapper|AdapterInterface

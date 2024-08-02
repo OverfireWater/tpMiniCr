@@ -16,15 +16,11 @@ if (!function_exists('sys_config')) {
             foreach ($sysConfig as &$item) {
                 if (str_contains($item, '/uploads/system/') || str_contains($item, '/statics/system_images/')) $item = set_file_url($item);
             }
-        } else {
+        } else if ($sysConfig) {
             if (str_contains($sysConfig, '/uploads/system/') || str_contains($sysConfig, '/statics/system_images/')) $sysConfig = set_file_url($sysConfig);
         }
-        $config = is_array($sysConfig) ? $sysConfig : trim($sysConfig);
-        if ($config === '') {
-            return $default;
-        } else {
-            return $config;
-        }
+        if (!$sysConfig) return $default;
+        return is_array($sysConfig) ? $sysConfig : trim($sysConfig);
     }
 }
 if (!function_exists('set_file_url')) {

@@ -10,6 +10,10 @@
 // +----------------------------------------------------------------------
 use think\facade\Route;
 
+Route::rule('test', function () {
+    return 1;
+});
+
 Route::miss(function () {
     $appRequest = request()->url();
     if (!$appRequest) {

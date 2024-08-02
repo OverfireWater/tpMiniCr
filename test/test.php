@@ -1,5 +1,6 @@
 <?php
-
-$array = [1];
-$array[] = 2;
-var_dump($array);
+enum B: string
+{
+    case A = 'a';
+}
+var_dump(B::A == 'a');

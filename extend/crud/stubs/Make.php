@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace crud\helper;
+namespace crud\stubs;
 
 use think\App;
 use think\helper\Str;
@@ -75,6 +75,20 @@ abstract class Make
      * 默认文件夹
      */
     protected string $baseDir;
+
+    /**
+     * 字段后缀
+     */
+    protected string $attrPrefix = '_label';
+
+    /**
+     * 获取字段后缀
+     * @return string
+     */
+    public function getAttrPrefix(): string
+    {
+        return $this->attrPrefix;
+    }
 
     public function __construct(
        protected App $app
@@ -347,7 +361,7 @@ abstract class Make
      * @param string $content
      * @return array|string|string[]
      */
-    protected function setContent(string $content)
+    protected function setContent(string $content): array|string
     {
         $this->content = str_replace(' ', '', $content);
         return $this->content;
