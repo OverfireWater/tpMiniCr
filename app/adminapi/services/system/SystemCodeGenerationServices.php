@@ -269,7 +269,7 @@ class SystemCodeGenerationServices extends BaseServices
         }
 
         // 事务
-        $res = $this->transaction(function () use ($data, $dataMenu, $cateName, $tableName, $uniqueAuth, $filePath) {
+        $res = $this->transaction(function () use ($data, $dataMenu, $cateName, $tableName, $uniqueAuth, $filePath, $table) {
             // 创建菜单
             $menuInfo = app()->make(SystemMenusServices::class)->save($dataMenu);
             // 获取分类id
@@ -294,9 +294,40 @@ class SystemCodeGenerationServices extends BaseServices
             }
             $routeRuleInfo = app()->make(SystemMenusServices::class)->saveRouteRule($menuData);
 
-            // TODO: 生成文件
             $make = $this->makeFile($tableName, $tableName, true, $data, $filePath);
+            $makePath = [];
+            foreach ($make as $key => $item) {
+                $makePath[$key] = $item['path'];
+            }
 
+            if ($table && isset($table['table']) && $table['table'] instanceof Table) {
+                //创建数据库
+                $table['table']->create();
+            }
+
+            $crudDate = [
+                'pid' => $data['pid'],
+                'name' => $data['menuName'],
+                'model_name' => $data['modelName'],
+                'table_name' => $tableName,
+                'table_comment' => $tableComment,
+                'table_collation' => self::TABLR_COLLATION,
+                'field' => json_encode($data),//提交的数据
+                'menu_ids' => json_encode($menuIds),//生成的菜单id
+                'menu_id' => $menuInfo->id,//生成的菜单id
+                'make_path' => json_encode($makePath),
+                'route_ids' => json_encode($routeIds),
+            ];
+
+            if ($crudInfo) {
+                $res = $this->dao->update($crudInfo->id, $crudDate);
+            } else {
+                $crudDate['add_time'] = time();
+                //记录crud生成
+                $res = $this->dao->save($crudDate);
+            }
+
+            return $res;
             return $systemRoute;
         });
 
@@ -340,6 +371,13 @@ class SystemCodeGenerationServices extends BaseServices
 
     /**
      * 生成文件
+     * @param string $tableName
+     * @param string $routeName
+     * @param bool $isMake
+     * @param array $options
+     * @param array $filePath
+     * @param string $basePath
+     * @return array
      */
     public function makeFile(string $tableName, string $routeName, bool $isMake = false, array $options = [], array $filePath = [], string $basePath = ''): array
     {
